@@ -10,10 +10,10 @@ const PatternGenerator = (() => {
   const FRAME_MM = 12.7; // Automatic half-inch frame; never a required setting.
   const LIMITS = {
     length: [40, 500], width: [40, 500], thickness: [0.6, 20],
-    slitWidth: [0.6, 8], density: [0, 100], complexity: [1, 8]
+    slitWidth: [0.6, 8], minSlitLength: [0, 1000], density: [0, 100], complexity: [1, 8]
   };
   const DEFAULTS = {
-    length: 200, width: 160, thickness: 3, slitWidth: 1.6,
+    length: 200, width: 160, thickness: 3, slitWidth: 1.6, minSlitLength: 30,
     density: 50, complexity: 5, style: 'circuit', seed: 'neon-01',
     units: 'mm', color: 'cyan'
   };
@@ -27,7 +27,8 @@ const PatternGenerator = (() => {
     for (const [name, [min, max]] of Object.entries(LIMITS)) {
       if (typeof settings[name] !== 'number' || !Number.isFinite(settings[name]) ||
           settings[name] < min || settings[name] > max) {
-        throw new Error(`${name} must be between ${min} and ${max}${
+        const label = name === 'minSlitLength' ? 'Minimum slit length' : name;
+        throw new Error(`${label} must be between ${min} and ${max}${
           ['density', 'complexity'].includes(name) ? '' : ' mm'}.`);
       }
     }
@@ -59,6 +60,13 @@ const PatternGenerator = (() => {
 
   function pathSegments(path) {
     return path.slice(1).map((b, i) => ({ a: path[i], b }));
+  }
+
+  function pathLength(path) {
+    // Measure along the centerline, including every bend, rather than taking
+    // the straight-line distance between the two ends.
+    return pathSegments(path).reduce((total, { a, b }) =>
+      total + Math.hypot(b.x - a.x, b.y - a.y), 0);
   }
 
   function offsetPath(path, width) {
@@ -149,6 +157,10 @@ const PatternGenerator = (() => {
       }
 
       if (path.length < 2) continue;
+      // A path can stop early when it runs into the frame or another slit.
+      // Reject that entire candidate before it claims any space in the panel.
+      // Never shorten this threshold just to fill the requested density.
+      if (pathLength(path) < settings.minSlitLength) continue;
       const hole = offsetPath(path, settings.slitWidth);
       if (!G.isSimplePolygon(hole)) continue;
       if (hole.some(p => p.x < FRAME_MM || p.x > settings.length - FRAME_MM ||
@@ -169,5 +181,5 @@ const PatternGenerator = (() => {
     };
   }
 
-  return { DEFAULTS, LIMITS, FRAME_MM, validate, seededRandom, offsetPath, generate };
+  return { DEFAULTS, LIMITS, FRAME_MM, validate, seededRandom, pathLength, offsetPath, generate };
 })();

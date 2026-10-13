@@ -5,7 +5,7 @@
 (() => {
   const P = PatternGenerator;
   const $ = id => document.getElementById(id);
-  const dimensionNames = ['length', 'width', 'thickness', 'slitWidth'];
+  const dimensionNames = ['length', 'width', 'thickness', 'slitWidth', 'minSlitLength'];
   const form = $('settings-form');
   const preview = new PanelPreview.Preview($('preview'));
   let settings = { ...P.DEFAULTS };
@@ -111,9 +111,9 @@
       updateStats();
       rememberSettings();
       if (pattern.holes.length === 0) {
-        showStatus('No slits fit these dimensions. Enlarge the panel or reduce the slit width.');
+        showStatus('No slits fit these settings. Enlarge the panel, reduce the slit width or minimum length, or allow more bends.');
       } else if (pattern.densityLimited) {
-        showStatus('Spacing limits the density for this size. Try narrower slits or a larger panel for more lines.');
+        showStatus('Spacing and minimum length limit the density for this size. Try narrower slits, a lower minimum length, or a larger panel for more lines.');
       } else {
         showStatus('');
       }
@@ -184,13 +184,16 @@
     }, null, 2) + '\n'], { type: 'application/json' }), fileName('json'));
   }
 
-  function checkedSettings(candidate) {
+  function checkedSettings(candidate, { preserveLegacyPattern = false } = {}) {
     if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) {
       throw new Error('The settings file must contain a settings object.');
     }
     // Pick known properties instead of copying arbitrary imported keys.
     const next = Object.fromEntries(Object.keys(P.DEFAULTS).map(key =>
       [key, candidate[key] === undefined ? P.DEFAULTS[key] : candidate[key]]));
+    // Old downloaded designs had no minimum. Keep their exact seeded geometry
+    // when imported; old browser sessions adopt the new default instead.
+    if (preserveLegacyPattern && candidate.minSlitLength === undefined) next.minSlitLength = 0;
     P.validate(next);
     if (!Object.hasOwn(PanelPreview.COLORS, next.color)) throw new Error('Choose a supported light color.');
     return next;
@@ -205,7 +208,7 @@
       if (saved.format !== 'light-pattern-generator' || saved.version !== 1) {
         throw new Error('This is not a supported Light Pattern settings file.');
       }
-      settings = checkedSettings(saved.settings);
+      settings = checkedSettings(saved.settings, { preserveLegacyPattern: true });
       writeForm();
       regenerate();
     } catch (error) {

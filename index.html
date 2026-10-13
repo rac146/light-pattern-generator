@@ -206,6 +206,8 @@ footer > span:first-child { letter-spacing: 1.6px; }
               <option value="mixed">Mixed · a bit of both</option>
             </select>
             <label for="slitWidth">Slit width <span class="input-wrap"><input id="slitWidth" name="slitWidth" type="number" value="1.6" step="0.1" required><span class="unit-label">mm</span></span></label>
+            <label for="minSlitLength">Minimum slit length <span class="input-wrap"><input id="minSlitLength" name="minSlitLength" type="number" value="30" step="0.1" aria-describedby="min-slit-hint" required><span class="unit-label">mm</span></span></label>
+            <p id="min-slit-hint" class="hint">Total length along each slit’s bends. Set 0 for no minimum.</p>
             <div class="range-heading"><label for="density">Density</label><output id="density-value" for="density">50%</output></div>
             <input id="density" name="density" type="range" min="0" max="100" value="50">
             <div class="range-captions"><span>Scattered</span><span>Busy</span></div>
@@ -406,10 +408,10 @@ const PatternGenerator = (() => {
   const FRAME_MM = 12.7; // Automatic half-inch frame; never a required setting.
   const LIMITS = {
     length: [40, 500], width: [40, 500], thickness: [0.6, 20],
-    slitWidth: [0.6, 8], density: [0, 100], complexity: [1, 8]
+    slitWidth: [0.6, 8], minSlitLength: [0, 1000], density: [0, 100], complexity: [1, 8]
   };
   const DEFAULTS = {
-    length: 200, width: 160, thickness: 3, slitWidth: 1.6,
+    length: 200, width: 160, thickness: 3, slitWidth: 1.6, minSlitLength: 30,
     density: 50, complexity: 5, style: 'circuit', seed: 'neon-01',
     units: 'mm', color: 'cyan'
   };
@@ -423,7 +425,8 @@ const PatternGenerator = (() => {
     for (const [name, [min, max]] of Object.entries(LIMITS)) {
       if (typeof settings[name] !== 'number' || !Number.isFinite(settings[name]) ||
           settings[name] < min || settings[name] > max) {
-        throw new Error(`${name} must be between ${min} and ${max}${
+        const label = name === 'minSlitLength' ? 'Minimum slit length' : name;
+        throw new Error(`${label} must be between ${min} and ${max}${
           ['density', 'complexity'].includes(name) ? '' : ' mm'}.`);
       }
     }
@@ -455,6 +458,13 @@ const PatternGenerator = (() => {
 
   function pathSegments(path) {
     return path.slice(1).map((b, i) => ({ a: path[i], b }));
+  }
+
+  function pathLength(path) {
+    // Measure along the centerline, including every bend, rather than taking
+    // the straight-line distance between the two ends.
+    return pathSegments(path).reduce((total, { a, b }) =>
+      total + Math.hypot(b.x - a.x, b.y - a.y), 0);
   }
 
   function offsetPath(path, width) {
@@ -545,6 +555,10 @@ const PatternGenerator = (() => {
       }
 
       if (path.length < 2) continue;
+      // A path can stop early when it runs into the frame or another slit.
+      // Reject that entire candidate before it claims any space in the panel.
+      // Never shorten this threshold just to fill the requested density.
+      if (pathLength(path) < settings.minSlitLength) continue;
       const hole = offsetPath(path, settings.slitWidth);
       if (!G.isSimplePolygon(hole)) continue;
       if (hole.some(p => p.x < FRAME_MM || p.x > settings.length - FRAME_MM ||
@@ -565,7 +579,7 @@ const PatternGenerator = (() => {
     };
   }
 
-  return { DEFAULTS, LIMITS, FRAME_MM, validate, seededRandom, offsetPath, generate };
+  return { DEFAULTS, LIMITS, FRAME_MM, validate, seededRandom, pathLength, offsetPath, generate };
 })();
 
 
@@ -959,7 +973,7 @@ const PanelPreview = (() => {
 (() => {
   const P = PatternGenerator;
   const $ = id => document.getElementById(id);
-  const dimensionNames = ['length', 'width', 'thickness', 'slitWidth'];
+  const dimensionNames = ['length', 'width', 'thickness', 'slitWidth', 'minSlitLength'];
   const form = $('settings-form');
   const preview = new PanelPreview.Preview($('preview'));
   let settings = { ...P.DEFAULTS };
@@ -1065,9 +1079,9 @@ const PanelPreview = (() => {
       updateStats();
       rememberSettings();
       if (pattern.holes.length === 0) {
-        showStatus('No slits fit these dimensions. Enlarge the panel or reduce the slit width.');
+        showStatus('No slits fit these settings. Enlarge the panel, reduce the slit width or minimum length, or allow more bends.');
       } else if (pattern.densityLimited) {
-        showStatus('Spacing limits the density for this size. Try narrower slits or a larger panel for more lines.');
+        showStatus('Spacing and minimum length limit the density for this size. Try narrower slits, a lower minimum length, or a larger panel for more lines.');
       } else {
         showStatus('');
       }
@@ -1138,13 +1152,16 @@ const PanelPreview = (() => {
     }, null, 2) + '\n'], { type: 'application/json' }), fileName('json'));
   }
 
-  function checkedSettings(candidate) {
+  function checkedSettings(candidate, { preserveLegacyPattern = false } = {}) {
     if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) {
       throw new Error('The settings file must contain a settings object.');
     }
     // Pick known properties instead of copying arbitrary imported keys.
     const next = Object.fromEntries(Object.keys(P.DEFAULTS).map(key =>
       [key, candidate[key] === undefined ? P.DEFAULTS[key] : candidate[key]]));
+    // Old downloaded designs had no minimum. Keep their exact seeded geometry
+    // when imported; old browser sessions adopt the new default instead.
+    if (preserveLegacyPattern && candidate.minSlitLength === undefined) next.minSlitLength = 0;
     P.validate(next);
     if (!Object.hasOwn(PanelPreview.COLORS, next.color)) throw new Error('Choose a supported light color.');
     return next;
@@ -1159,7 +1176,7 @@ const PanelPreview = (() => {
       if (saved.format !== 'light-pattern-generator' || saved.version !== 1) {
         throw new Error('This is not a supported Light Pattern settings file.');
       }
-      settings = checkedSettings(saved.settings);
+      settings = checkedSettings(saved.settings, { preserveLegacyPattern: true });
       writeForm();
       regenerate();
     } catch (error) {

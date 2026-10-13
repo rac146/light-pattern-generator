@@ -10,8 +10,8 @@ network requests, installation, or server.
    Windows, macOS, and Linux are supported where the browser is available.
 2. Set the panel length, width, thickness, and slit width. Switch between mm
    and inches whenever you like; exported STL coordinates are always **mm**.
-3. Choose Circuit, Lightning, or Mixed. Adjust density and bends, or shuffle
-   until you find a pattern you like.
+3. Choose Circuit, Lightning, or Mixed. Set the minimum slit length, adjust
+   density and bends, or shuffle until you find a pattern you like.
 4. Check Backlit, Cutouts, or the rotatable 3D model preview.
 5. Download the STL and open it in your slicer. Print with the large flat face
    on the bed; the through-slits do not require supports.
@@ -22,6 +22,13 @@ seed, and style. If browser storage is available, the app also remembers your
 last settings. Moving the HTML or using another browser may reset that memory;
 saved JSON files work independently of browser storage.
 
+Minimum slit length defaults to **30 mm** (about 1.18 inches), measured along
+the entire slit's centerline, including bends. It does not set a minimum for
+each individual straight segment. Set it to **0** to allow any path length.
+Settings saved by the earlier app still load: files without this field use 0
+to reproduce their original design. Existing browser sessions without the field
+adopt the new 30 mm default when the updated app opens.
+
 The backlight colors only affect the preview. Use opaque filament for stronger
 contrast, and check that the model fits your printer bed. Preview brightness
 does not predict a real light source’s brightness.
@@ -30,18 +37,22 @@ does not predict a real light source’s brightness.
 
 - The panel has an automatic **12.7 mm (½-inch) solid border**.
 - Cutouts have a constant width, flat ends, and sharp, mitered bends.
+- Shorter paths are discarded before becoming cutouts; the generator never
+  relaxes the minimum length to fill an empty area.
 - Paths never close, cross themselves, or touch another cutout. Each cutout
   becomes a simple polygon wholly inside the frame, so no disconnected solid
   islands are produced.
 - Automatic material spacing is at least **2.4 mm**, increasing with slit width.
   This keeps nearby cuts apart; mechanical strength still depends on filament,
   layer adhesion, thickness, and the final size.
-- Density is a target rather than a fixed open percentage. Spacing can limit it
-  on small or crowded panels. The UI reports the actual light opening percentage.
+- Density is a target rather than a fixed open percentage. Spacing and minimum
+  slit length can limit it on small or crowded panels. The UI reports the actual
+  light opening percentage.
 - Dimensions: 40–500 mm; thickness: 0.6–20 mm; slits: 0.6–8 mm.
   These are model limits, not a printer bed or nozzle profile.
-- A small panel with very wide slits may have no room for a pattern. The app
-  reports this and allows exporting the resulting solid plate.
+- Minimum slit length: 0–1000 mm. A high minimum, a small panel, or very wide
+  slits may leave no room for a pattern. The app reports this and allows exporting
+  the resulting solid plate. Lower the minimum or allow more bends if needed.
 - STL stores no units. Import as millimeters if your slicer asks.
 
 ## Edit the code

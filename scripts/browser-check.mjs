@@ -114,10 +114,12 @@ try {
   await waitFor(() => evaluate(`document.querySelector('#paths-stat')?.textContent !== '—' && document.querySelector('#paths-stat')?.textContent`), 'initial pattern');
   assert.ok(await evaluate('Number(document.querySelector("#paths-stat").textContent) > 0'));
   assert.equal(await evaluate('document.querySelector("#export-stl").disabled'), false);
+  assert.equal(await evaluate('document.querySelector("#minSlitLength").value'), '30');
   await screenshot('desktop-backlit.png');
 
   await click('[data-unit="in"]');
   assert.equal(await evaluate('document.querySelector("#length").value'), '7.874');
+  assert.equal(await evaluate('document.querySelector("#minSlitLength").value'), '1.1811');
   await click('[data-unit="mm"]');
   assert.equal(await evaluate('document.querySelector("#length").value'), '200');
   // Changing a unit display must not round the internal model dimensions.
@@ -129,6 +131,17 @@ try {
   await evaluate(`document.querySelector('#length').value = '0'; document.querySelector('#length').dispatchEvent(new Event('change', {bubbles:true}))`);
   assert.equal(await evaluate('document.querySelector("#export-stl").disabled'), true);
   assert.ok(await evaluate('document.querySelector("#status").classList.contains("error")'));
+  await click('#reset');
+
+  await evaluate(`document.querySelector('#minSlitLength').value = '-1'; document.querySelector('#minSlitLength').dispatchEvent(new Event('change', {bubbles:true}))`);
+  assert.equal(await evaluate('document.querySelector("#export-stl").disabled'), true);
+  assert.equal(await evaluate('document.querySelector("#minSlitLength").getAttribute("aria-invalid")'), 'true');
+  await click('#reset');
+  await evaluate(`for (const [id,value] of Object.entries({length:40,width:40,minSlitLength:1000})) document.getElementById(id).value = value;
+    document.querySelector('#minSlitLength').dispatchEvent(new Event('change', {bubbles:true}))`);
+  assert.equal(await evaluate('document.querySelector("#paths-stat").textContent'), '0');
+  assert.ok(await evaluate('document.querySelector("#status").textContent.includes("minimum length")'));
+  assert.equal(await evaluate('document.querySelector("#export-stl").disabled'), false);
   await click('#reset');
 
   const oldSeed = await evaluate('document.querySelector("#seed").value');
@@ -157,6 +170,13 @@ try {
   await screenshot('desktop-cutouts.png');
   await click('[data-view="light"]');
 
+  // Verify the new setting changes actual exported geometry, survives display
+  // unit switching without rounding, and persists through save/load.
+  await evaluate(`document.querySelector('#minSlitLength').value = '60.125'; document.querySelector('#minSlitLength').dispatchEvent(new Event('change', {bubbles:true}))`);
+  for (let i = 0; i < 3; i++) { await click('[data-unit="in"]'); await click('[data-unit="mm"]'); }
+  assert.equal(await evaluate('document.querySelector("#minSlitLength").value'), '60.125');
+  await screenshot('desktop-minimum-length.png');
+
   await click('#export-stl');
   await waitFor(async () => (await readdir(downloads)).some(name => name.endsWith('.stl')), 'STL download');
   const stlName = (await readdir(downloads)).find(name => name.endsWith('.stl'));
@@ -169,7 +189,7 @@ try {
     readFile(path.join(root, 'src', `${name}.js`), 'utf8')));
   const engineContext = vm.createContext({ TextEncoder });
   const expectedBuffer = vm.runInContext(engineSources.join('\n') +
-    '\nMeshBuilder.binarySTL(MeshBuilder.build(PatternGenerator.generate(PatternGenerator.DEFAULTS)))', engineContext);
+    '\nMeshBuilder.binarySTL(MeshBuilder.build(PatternGenerator.generate({...PatternGenerator.DEFAULTS, minSlitLength:60.125})))', engineContext);
   assert.deepEqual(stl, Buffer.from(expectedBuffer), 'Browser and Node must produce identical STL bytes');
 
   await click('#save-settings');
@@ -178,12 +198,30 @@ try {
   const saved = JSON.parse(await readFile(path.join(downloads, settingsName), 'utf8'));
   assert.equal(saved.format, 'light-pattern-generator');
   assert.equal(saved.settings.length, 200);
+  assert.equal(saved.settings.minSlitLength, 60.125);
 
   await evaluate(`document.querySelector('#length').value = '222'; document.querySelector('#length').dispatchEvent(new Event('change', {bubbles:true}))`);
+  await evaluate(`document.querySelector('#minSlitLength').value = '10'; document.querySelector('#minSlitLength').dispatchEvent(new Event('change', {bubbles:true}))`);
   const { root: dom } = await command('DOM.getDocument');
   const { nodeId } = await command('DOM.querySelector', { nodeId: dom.nodeId, selector: '#settings-file' });
   await command('DOM.setFileInputFiles', { nodeId, files: [path.join(downloads, settingsName)] });
   await waitFor(() => evaluate('document.querySelector("#length").value === "200"'), 'settings import');
+  assert.equal(await evaluate('document.querySelector("#minSlitLength").value'), '60.125');
+
+  // Earlier downloaded settings recreate the original geometry with no minimum.
+  const legacySettings = path.join(downloads, 'legacy-settings.json');
+  const legacy = { ...saved, settings: { ...saved.settings, style: 'lightning' } };
+  delete legacy.settings.minSlitLength;
+  await writeFile(legacySettings, JSON.stringify(legacy));
+  await command('DOM.setFileInputFiles', { nodeId, files: [legacySettings] });
+  await waitFor(() => evaluate('document.querySelector("#minSlitLength").value === "0"'), 'legacy settings import');
+  assert.equal(await evaluate('document.querySelector("#paths-stat").textContent'), '18');
+
+  // Existing browser sessions without the field adopt the improved default.
+  await evaluate(`localStorage.setItem('light-pattern-settings-v1', ${JSON.stringify(JSON.stringify(legacy.settings))})`);
+  await command('Page.reload');
+  await waitFor(() => evaluate('document.querySelector("#minSlitLength")?.value === "30" && document.querySelector("#export-stl")?.disabled === false'), 'legacy browser-session migration');
+  await click('#reset');
 
   await command('Emulation.setDeviceMetricsOverride', {
     width: 390, height: 844, deviceScaleFactor: 1, mobile: true

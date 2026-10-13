@@ -78,6 +78,55 @@ test('same seed and settings reproduce exactly the same cutouts', () => {
   assert.notDeepEqual(first.holes, P.generate(settings({ seed: 'another seed' })).holes);
 });
 
+test('minimum slit length applies to the whole centerline, including bends', () => {
+  // The endpoints are only 5 mm apart, but the bent path is 65 mm long.
+  const bent = [{ x: 0, y: 0 }, { x: 30, y: 0 }, { x: 30, y: 5 }, { x: 0, y: 5 }];
+  assert.equal(P.pathLength(bent), 65);
+  assert.equal(P.pathLength([{ x: 0, y: 0 }, { x: 3, y: 4 }]), 5);
+
+  for (const style of ['circuit', 'lightning', 'mixed']) {
+    for (const minSlitLength of [30, 60, 120]) {
+      for (let seed = 0; seed < 3; seed++) {
+        const pattern = P.generate(settings({ style, minSlitLength, seed: `length-${seed}`, density: 100 }));
+        assert.ok(pattern.paths.length > 0, `${style}, minimum ${minSlitLength}`);
+        for (const path of pattern.paths) {
+          // Independently measure the generated coordinates, including diagonals.
+          const length = path.slice(1).reduce((total, p, i) =>
+            total + Math.hypot(p.x - path[i].x, p.y - path[i].y), 0);
+          assert.ok(length >= minSlitLength, `Slit ${length} mm is shorter than ${minSlitLength} mm`);
+        }
+      }
+    }
+  }
+});
+
+test('zero minimum retains legacy seeded designs and short slits', () => {
+  // Reference counts for the original app's default seed/settings.
+  for (const [style, count] of [['circuit', 15], ['lightning', 18], ['mixed', 16]]) {
+    const legacy = P.generate(settings({ style, minSlitLength: 0 }));
+    assert.equal(legacy.paths.length, count);
+  }
+  const legacy = P.generate(settings({ style: 'lightning', minSlitLength: 0 }));
+  assert.ok(legacy.paths.some(path => P.pathLength(path) < 30));
+  const filtered = P.generate(settings({ style: 'lightning', minSlitLength: 30 }));
+  assert.ok(filtered.paths.every(path => P.pathLength(path) >= 30));
+  assert.notDeepEqual(filtered.holes, legacy.holes);
+});
+
+test('high minimum preserves connectivity and never falls back to short slits', () => {
+  for (const style of ['circuit', 'lightning', 'mixed']) {
+    inspectMesh(P.generate(settings({ style, minSlitLength: 100, density: 100 })));
+    const impossible = P.generate(settings({
+      style, length: 40, width: 40, minSlitLength: 1000, density: 100
+    }));
+    assert.equal(impossible.paths.length, 0);
+    assert.equal(impossible.holes.length, 0);
+    assert.equal(impossible.openArea, 0);
+    assert.ok(impossible.densityLimited);
+    inspectMesh(impossible);
+  }
+});
+
 test('cutouts are simple, framed, and maintain the minimum material gap', () => {
   for (const style of ['circuit', 'lightning', 'mixed']) {
     for (let seed = 0; seed < 8; seed++) {
@@ -148,6 +197,8 @@ test('invalid and untrusted settings are rejected', () => {
   for (const options of [
     { length: NaN }, { width: 0 }, { thickness: Infinity }, { slitWidth: -1 },
     { length: '200' }, { seed: '' }, { seed: 'x'.repeat(65) },
-    { style: '<script>' }, { density: 101 }, { complexity: 2.5 }, { units: 'cm' }
+    { style: '<script>' }, { density: 101 }, { complexity: 2.5 }, { units: 'cm' },
+    { minSlitLength: -1 }, { minSlitLength: 1001 }, { minSlitLength: NaN },
+    { minSlitLength: Infinity }, { minSlitLength: '30' }
   ]) assert.throws(() => P.generate(settings(options)));
 });
