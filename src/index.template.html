@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Light Pattern Generator</title>
+  <style>/* INLINE_STYLES */</style>
+</head>
+<body>
+  <header class="page-header">
+    <a class="brand" href="#" aria-label="Light Pattern Generator home">
+      <span class="brand-mark" aria-hidden="true">╱</span>
+      <span>LIGHT<span class="brand-light"> / PATTERN</span></span>
+    </a>
+    <span class="offline-badge"><span></span> Offline · no installation</span>
+  </header>
+
+  <main>
+    <div class="intro">
+      <div>
+        <p class="eyebrow">A little structure. A lot of light.</p>
+        <h1>Make your next glow.</h1>
+        <p class="subtitle">Random slit patterns. One printable panel. Endless possibilities.</p>
+      </div>
+      <button id="shuffle" class="button button-accent" type="button">
+        <span aria-hidden="true">⤨</span> Shuffle pattern
+      </button>
+    </div>
+
+    <div class="workspace">
+      <aside class="controls" aria-label="Panel settings">
+        <form id="settings-form">
+          <fieldset>
+            <legend class="section-top">
+              <span class="legend-title">01 <span>Panel dimensions</span></span>
+              <span class="unit-switch" role="group" aria-label="Measurement units">
+                <button type="button" data-unit="mm" aria-pressed="true">mm</button>
+                <button type="button" data-unit="in" aria-pressed="false">in</button>
+              </span>
+            </legend>
+            <div class="dimension-grid">
+              <label for="length">Length <span class="input-wrap"><input id="length" name="length" type="number" value="200" step="0.1" required><span class="unit-label">mm</span></span></label>
+              <label for="width">Width <span class="input-wrap"><input id="width" name="width" type="number" value="160" step="0.1" required><span class="unit-label">mm</span></span></label>
+            </div>
+            <label for="thickness">Thickness <span class="input-wrap"><input id="thickness" name="thickness" type="number" value="3" step="0.1" required><span class="unit-label">mm</span></span></label>
+          </fieldset>
+
+          <fieldset>
+            <legend><span class="legend-title">02 <span>Pattern</span></span></legend>
+            <label for="style">Line style</label>
+            <select id="style" name="style">
+              <option value="circuit">Circuit · square turns</option>
+              <option value="lightning">Lightning · angled turns</option>
+              <option value="mixed">Mixed · a bit of both</option>
+            </select>
+            <label for="slitWidth">Slit width <span class="input-wrap"><input id="slitWidth" name="slitWidth" type="number" value="1.6" step="0.1" required><span class="unit-label">mm</span></span></label>
+            <div class="range-heading"><label for="density">Density</label><output id="density-value" for="density">50%</output></div>
+            <input id="density" name="density" type="range" min="0" max="100" value="50">
+            <div class="range-captions"><span>Scattered</span><span>Busy</span></div>
+            <div class="range-heading"><label for="complexity">Bends</label><output id="complexity-value" for="complexity">5</output></div>
+            <input id="complexity" name="complexity" type="range" min="1" max="8" value="5">
+            <div class="range-captions"><span>Simple</span><span>Winding</span></div>
+            <label for="seed">Pattern seed</label>
+            <input id="seed" name="seed" type="text" value="neon-01" maxlength="64" spellcheck="false" autocomplete="off" required>
+            <p class="hint">Same seed + same settings = same pattern.</p>
+          </fieldset>
+        </form>
+
+        <div class="automatic-note">
+          <span class="note-symbol" aria-hidden="true">◇</span>
+          <p><strong>Designed to stay together.</strong><br>A solid frame and spaced, open-ended cuts keep your panel in one piece.</p>
+        </div>
+        <div class="settings-actions">
+          <button id="save-settings" class="button button-subtle" type="button">Save settings</button>
+          <button id="load-settings" class="button button-subtle" type="button">Load settings</button>
+          <input id="settings-file" type="file" accept=".json,application/json" hidden>
+        </div>
+        <button id="reset" class="text-button" type="button">Reset to defaults</button>
+      </aside>
+
+      <section class="preview-panel" aria-label="Live panel preview">
+        <div class="preview-toolbar">
+          <div class="view-switch" role="group" aria-label="Preview mode">
+            <button type="button" data-view="light" aria-pressed="true">Backlit</button>
+            <button type="button" data-view="solid" aria-pressed="false">Cutouts</button>
+            <button type="button" data-view="3d" aria-pressed="false">3D model</button>
+          </div>
+          <div class="swatches" role="group" aria-label="Preview light color">
+            <button type="button" data-color="cyan" aria-label="Cyan light" aria-pressed="true" style="--swatch:#45f4ef"></button>
+            <button type="button" data-color="violet" aria-label="Violet light" aria-pressed="false" style="--swatch:#ad8aff"></button>
+            <button type="button" data-color="amber" aria-label="Amber light" aria-pressed="false" style="--swatch:#ffbf66"></button>
+          </div>
+        </div>
+
+        <div id="preview-stage" class="preview-stage">
+          <canvas id="preview" role="img" aria-label="Backlit preview of the generated panel"></canvas>
+          <span id="preview-caption" class="preview-caption">Backlit preview · color is illustrative</span>
+          <button id="reset-view" class="text-button reset-view" type="button" hidden>Reset view</button>
+        </div>
+
+        <div class="stats" aria-label="Generated panel information">
+          <div><span class="stat-label">PANEL SIZE</span><strong id="size-stat">200 × 160 × 3 mm</strong></div>
+          <div><span class="stat-label">LIGHT OPENING</span><strong id="opening-stat">—</strong></div>
+          <div><span class="stat-label">SLIT PATHS</span><strong id="paths-stat">—</strong></div>
+        </div>
+        <div id="status" class="status" role="status" aria-live="polite"></div>
+        <div class="export-row">
+          <p><strong>From a pattern to a print.</strong><br>Export in millimeters. Print flat, with no supports.</p>
+          <button id="export-stl" class="button button-accent export-button" type="button"><span aria-hidden="true">↓</span> Download STL</button>
+        </div>
+      </section>
+    </div>
+    <p class="print-note">Start with an opaque filament for crisp light lines. Check the STL in your slicer before printing; large panels must fit your printer’s bed.</p>
+  </main>
+
+  <footer><span>LIGHT / PATTERN</span><span>Your patterns stay on your device.</span></footer>
+  <noscript><p class="noscript">Enable JavaScript in your browser to generate and export a panel.</p></noscript>
+  <script>/* INLINE_SCRIPTS */</script>
+</body>
+</html>

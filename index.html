@@ -1,0 +1,1223 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Light Pattern Generator</title>
+  <style>:root {
+  --background: #0c1114;
+  --surface: #121a1e;
+  --surface-raised: #182227;
+  --line: #27343b;
+  --muted: #91a3ac;
+  --text: #ebf2f4;
+  --accent: #80ebcd;
+  --radius: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--text);
+  background: var(--background);
+  font-size: 14px;
+  line-height: 1.5;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+button:disabled { opacity: .45; cursor: not-allowed; }
+button, input, select { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+[hidden] { display: none !important; }
+.page-header, main, footer { max-width: 1280px; margin: 0 auto; padding-left: 40px; padding-right: 40px; }
+.page-header { height: 94px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }
+.brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text); font-size: 15px; font-weight: 750; letter-spacing: 2px; }
+.brand-mark { display: grid; place-items: center; width: 29px; height: 29px; border: 1px solid var(--accent); border-radius: 6px; color: var(--accent); font-size: 21px; }
+.brand-light { font-weight: 400; color: var(--muted); }
+.offline-badge { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
+.offline-badge > span { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
+.intro { padding: 42px 0 30px; display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+.eyebrow { color: var(--accent); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 8px; }
+h1 { margin: 0; font-size: clamp(28px, 3vw, 39px); font-weight: 650; line-height: 1.2; letter-spacing: -1.1px; }
+.subtitle { color: var(--muted); margin: 12px 0 0; }
+.button { display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 12px 18px; border: 1px solid transparent; border-radius: 8px; font-size: 13px; font-weight: 600; white-space: nowrap; transition: background .15s; }
+.button-accent { background: var(--accent); color: #0a2920; }
+.button-accent:hover { background: #a4f6de; }
+.button-accent > span { font-size: 19px; line-height: 1; }
+.button-subtle { background: transparent; color: #b8c8ce; border-color: var(--line); padding: 9px 11px; font-size: 12px; }
+.button-subtle:hover { background: var(--surface-raised); }
+.workspace { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 22px; align-items: start; }
+.controls { padding: 23px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+fieldset { border: 0; padding: 0; margin: 0 0 24px; min-width: 0; }
+fieldset:first-child { padding-bottom: 22px; border-bottom: 1px solid var(--line); }
+legend { color: #637b84; font-size: 11px; letter-spacing: 1px; margin-bottom: 17px; padding: 0; width: 100%; }
+legend .legend-title > span { color: var(--text); margin-left: 9px; letter-spacing: .2px; font-size: 13px; font-weight: 600; }
+.section-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 17px; }
+.unit-switch, .view-switch { display: flex; background: #0c1317; border: 1px solid var(--line); border-radius: 7px; padding: 3px; }
+.unit-switch button, .view-switch button { border: 0; border-radius: 4px; padding: 4px 8px; color: var(--muted); background: transparent; font-size: 11px; }
+.unit-switch button[aria-pressed="true"], .view-switch button[aria-pressed="true"] { background: #293a42; color: var(--text); }
+label { display: block; color: #b4c3c9; font-size: 12px; margin-bottom: 7px; }
+input[type="number"], input[type="text"], select { width: 100%; border: 1px solid #304047; border-radius: 7px; padding: 10px 11px; color: var(--text); background: #0d1519; min-width: 0; }
+input[aria-invalid="true"] { border-color: #ec9581; }
+input[type="number"] { appearance: textfield; -moz-appearance: textfield; }
+input::-webkit-inner-spin-button { appearance: none; }
+.input-wrap { position: relative; display: block; margin-top: 7px; }
+.input-wrap input { padding-right: 35px; }
+.unit-label { position: absolute; right: 11px; top: 10px; color: #6e8790; font-size: 12px; pointer-events: none; }
+.dimension-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 7px; }
+select { margin-bottom: 15px; }
+.range-heading { display: flex; align-items: center; justify-content: space-between; margin: 17px 0 5px; }
+.range-heading label { margin: 0; }
+output { font-size: 12px; color: var(--accent); font-variant-numeric: tabular-nums; }
+input[type="range"] { width: 100%; margin: 5px 0; accent-color: var(--accent); cursor: pointer; }
+.range-captions { display: flex; justify-content: space-between; font-size: 10px; color: #718992; margin-bottom: 15px; }
+.hint { font-size: 10px; color: #8299a2; margin: 7px 0 0; }
+.automatic-note { display: flex; align-items: start; gap: 9px; padding: 13px 0 0; border-top: 1px solid var(--line); }
+.note-symbol { color: var(--accent); font-size: 19px; line-height: 1.3; }
+.automatic-note p { color: #8da5ae; font-size: 11px; line-height: 1.65; margin: 0; }
+.automatic-note strong { color: #c8d7dc; font-weight: 500; }
+.settings-actions { display: flex; gap: 8px; margin-top: 20px; }
+.settings-actions button { flex: 1; }
+.text-button { border: 0; padding: 0; background: transparent; color: #8aa1ab; font-size: 11px; text-decoration: underline; text-underline-offset: 3px; }
+#reset { display: block; margin: 13px auto 0; }
+.preview-panel { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--surface); }
+.preview-toolbar { padding: 17px 22px; display: flex; align-items: center; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--line); }
+.view-switch button { padding: 6px 11px; font-size: 12px; }
+.swatches { display: flex; gap: 9px; }
+.swatches button { width: 17px; height: 17px; background: var(--swatch); border-radius: 50%; border: 3px solid var(--surface); outline: 1px solid transparent; }
+.swatches button[aria-pressed="true"] { outline-color: var(--swatch); }
+.preview-stage { position: relative; height: 510px; overflow: hidden; background: #080f13; }
+canvas { display: block; width: 100%; height: 100%; }
+canvas.draggable { cursor: grab; touch-action: none; }
+canvas.draggable:active { cursor: grabbing; }
+.preview-caption { position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%); font-size: 11px; white-space: nowrap; color: #738a94; pointer-events: none; }
+.reset-view { position: absolute; top: 15px; right: 20px; }
+.stats { display: grid; grid-template-columns: 1.7fr 1fr 1fr; border-top: 1px solid var(--line); padding: 23px 25px; }
+.stats > div { padding-left: 22px; border-left: 1px solid var(--line); }
+.stats > div:first-child { padding-left: 0; border-left: 0; }
+.stat-label { display: block; font-size: 9px; letter-spacing: 1.4px; color: #8097a0; margin-bottom: 7px; }
+.stats strong { font-size: 15px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.status { margin: 0 25px; font-size: 12px; color: #d4ba8b; }
+.status:not(:empty) { padding-bottom: 17px; }
+.status.error { color: #ffaf9c; }
+.export-row { padding: 21px 25px; display: flex; align-items: center; justify-content: space-between; gap: 15px; border-top: 1px solid var(--line); background: #162127; }
+.export-row p { margin: 0; color: #8ea5af; font-size: 11px; line-height: 1.8; }
+.export-row strong { font-weight: 500; font-size: 13px; color: #d6e3e8; }
+.print-note { color: #718992; font-size: 11px; margin: 18px 0 34px 312px; }
+footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 22px; padding-bottom: 26px; font-size: 10px; color: #66808a; }
+footer > span:first-child { letter-spacing: 1.6px; }
+.noscript { position: fixed; inset: 0; display: grid; place-items: center; background: var(--background); padding: 30px; }
+@media (min-width: 1500px) { .preview-stage { height: 550px; } }
+@media (max-width: 1000px) {
+  .page-header, main, footer { padding-left: 25px; padding-right: 25px; }
+  .workspace { grid-template-columns: 260px minmax(0, 1fr); gap: 16px; }
+  .controls { padding: 18px; }
+  .preview-toolbar { padding: 15px; }
+  .view-switch button { padding: 6px 8px; font-size: 11px; }
+  .preview-stage { height: 490px; }
+  .stats { padding: 20px 17px; grid-template-columns: 1.6fr 1fr .7fr; }
+  .stats > div { padding-left: 12px; }
+  .stats strong { font-size: 12px; }
+  .stat-label { font-size: 8px; letter-spacing: .7px; }
+  .export-row { padding: 17px; flex-wrap: wrap; }
+  .export-button { width: 100%; }
+  .print-note { margin-left: 276px; }
+}
+@media (max-width: 730px) {
+  .page-header { height: 73px; }
+  .page-header, main, footer { padding-left: 18px; padding-right: 18px; }
+  .brand { font-size: 12px; letter-spacing: 1.2px; gap: 8px; }
+  .offline-badge { font-size: 0; gap: 0; }
+  .intro { padding: 28px 0 24px; flex-wrap: wrap; gap: 19px; }
+  .subtitle { font-size: 12px; }
+  .workspace { grid-template-columns: 1fr; }
+  .preview-panel { grid-row: 1; }
+  .preview-stage { height: 365px; }
+  .controls { padding: 22px; }
+  .dimension-grid { grid-template-columns: 1fr 1fr; }
+  .stats { padding: 18px; }
+  .stats strong { font-size: 12px; }
+  .export-row { flex-wrap: nowrap; }
+  .export-button { width: auto; padding: 11px; font-size: 12px; }
+  .export-row strong { font-size: 11px; }
+  .export-row p { font-size: 10px; }
+  .print-note { margin: 18px 0 26px; }
+  footer { gap: 15px; font-size: 9px; }
+}
+@media (max-width: 390px) {
+  .preview-toolbar { padding: 12px; gap: 5px; }
+  .view-switch button { padding: 5px 7px; font-size: 10px; }
+  .swatches { gap: 6px; }
+  .preview-stage { height: 300px; }
+  .stats { padding: 15px 12px; }
+  .stats > div { padding-left: 8px; }
+  .stats strong { font-size: 11px; }
+  .export-row { flex-wrap: wrap; }
+  .export-button { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+  <header class="page-header">
+    <a class="brand" href="#" aria-label="Light Pattern Generator home">
+      <span class="brand-mark" aria-hidden="true">╱</span>
+      <span>LIGHT<span class="brand-light"> / PATTERN</span></span>
+    </a>
+    <span class="offline-badge"><span></span> Offline · no installation</span>
+  </header>
+
+  <main>
+    <div class="intro">
+      <div>
+        <p class="eyebrow">A little structure. A lot of light.</p>
+        <h1>Make your next glow.</h1>
+        <p class="subtitle">Random slit patterns. One printable panel. Endless possibilities.</p>
+      </div>
+      <button id="shuffle" class="button button-accent" type="button">
+        <span aria-hidden="true">⤨</span> Shuffle pattern
+      </button>
+    </div>
+
+    <div class="workspace">
+      <aside class="controls" aria-label="Panel settings">
+        <form id="settings-form">
+          <fieldset>
+            <legend class="section-top">
+              <span class="legend-title">01 <span>Panel dimensions</span></span>
+              <span class="unit-switch" role="group" aria-label="Measurement units">
+                <button type="button" data-unit="mm" aria-pressed="true">mm</button>
+                <button type="button" data-unit="in" aria-pressed="false">in</button>
+              </span>
+            </legend>
+            <div class="dimension-grid">
+              <label for="length">Length <span class="input-wrap"><input id="length" name="length" type="number" value="200" step="0.1" required><span class="unit-label">mm</span></span></label>
+              <label for="width">Width <span class="input-wrap"><input id="width" name="width" type="number" value="160" step="0.1" required><span class="unit-label">mm</span></span></label>
+            </div>
+            <label for="thickness">Thickness <span class="input-wrap"><input id="thickness" name="thickness" type="number" value="3" step="0.1" required><span class="unit-label">mm</span></span></label>
+          </fieldset>
+
+          <fieldset>
+            <legend><span class="legend-title">02 <span>Pattern</span></span></legend>
+            <label for="style">Line style</label>
+            <select id="style" name="style">
+              <option value="circuit">Circuit · square turns</option>
+              <option value="lightning">Lightning · angled turns</option>
+              <option value="mixed">Mixed · a bit of both</option>
+            </select>
+            <label for="slitWidth">Slit width <span class="input-wrap"><input id="slitWidth" name="slitWidth" type="number" value="1.6" step="0.1" required><span class="unit-label">mm</span></span></label>
+            <div class="range-heading"><label for="density">Density</label><output id="density-value" for="density">50%</output></div>
+            <input id="density" name="density" type="range" min="0" max="100" value="50">
+            <div class="range-captions"><span>Scattered</span><span>Busy</span></div>
+            <div class="range-heading"><label for="complexity">Bends</label><output id="complexity-value" for="complexity">5</output></div>
+            <input id="complexity" name="complexity" type="range" min="1" max="8" value="5">
+            <div class="range-captions"><span>Simple</span><span>Winding</span></div>
+            <label for="seed">Pattern seed</label>
+            <input id="seed" name="seed" type="text" value="neon-01" maxlength="64" spellcheck="false" autocomplete="off" required>
+            <p class="hint">Same seed + same settings = same pattern.</p>
+          </fieldset>
+        </form>
+
+        <div class="automatic-note">
+          <span class="note-symbol" aria-hidden="true">◇</span>
+          <p><strong>Designed to stay together.</strong><br>A solid frame and spaced, open-ended cuts keep your panel in one piece.</p>
+        </div>
+        <div class="settings-actions">
+          <button id="save-settings" class="button button-subtle" type="button">Save settings</button>
+          <button id="load-settings" class="button button-subtle" type="button">Load settings</button>
+          <input id="settings-file" type="file" accept=".json,application/json" hidden>
+        </div>
+        <button id="reset" class="text-button" type="button">Reset to defaults</button>
+      </aside>
+
+      <section class="preview-panel" aria-label="Live panel preview">
+        <div class="preview-toolbar">
+          <div class="view-switch" role="group" aria-label="Preview mode">
+            <button type="button" data-view="light" aria-pressed="true">Backlit</button>
+            <button type="button" data-view="solid" aria-pressed="false">Cutouts</button>
+            <button type="button" data-view="3d" aria-pressed="false">3D model</button>
+          </div>
+          <div class="swatches" role="group" aria-label="Preview light color">
+            <button type="button" data-color="cyan" aria-label="Cyan light" aria-pressed="true" style="--swatch:#45f4ef"></button>
+            <button type="button" data-color="violet" aria-label="Violet light" aria-pressed="false" style="--swatch:#ad8aff"></button>
+            <button type="button" data-color="amber" aria-label="Amber light" aria-pressed="false" style="--swatch:#ffbf66"></button>
+          </div>
+        </div>
+
+        <div id="preview-stage" class="preview-stage">
+          <canvas id="preview" role="img" aria-label="Backlit preview of the generated panel"></canvas>
+          <span id="preview-caption" class="preview-caption">Backlit preview · color is illustrative</span>
+          <button id="reset-view" class="text-button reset-view" type="button" hidden>Reset view</button>
+        </div>
+
+        <div class="stats" aria-label="Generated panel information">
+          <div><span class="stat-label">PANEL SIZE</span><strong id="size-stat">200 × 160 × 3 mm</strong></div>
+          <div><span class="stat-label">LIGHT OPENING</span><strong id="opening-stat">—</strong></div>
+          <div><span class="stat-label">SLIT PATHS</span><strong id="paths-stat">—</strong></div>
+        </div>
+        <div id="status" class="status" role="status" aria-live="polite"></div>
+        <div class="export-row">
+          <p><strong>From a pattern to a print.</strong><br>Export in millimeters. Print flat, with no supports.</p>
+          <button id="export-stl" class="button button-accent export-button" type="button"><span aria-hidden="true">↓</span> Download STL</button>
+        </div>
+      </section>
+    </div>
+    <p class="print-note">Start with an opaque filament for crisp light lines. Check the STL in your slicer before printing; large panels must fit your printer’s bed.</p>
+  </main>
+
+  <footer><span>LIGHT / PATTERN</span><span>Your patterns stay on your device.</span></footer>
+  <noscript><p class="noscript">Enable JavaScript in your browser to generate and export a panel.</p></noscript>
+  <script>// ─── src/geometry.js ───
+/**
+ * Shared 2D geometry. All model coordinates are millimeters.
+ *
+ * Snap coordinates to one millionth of a millimeter so independently computed
+ * intersections become identical vertices, including in the STL export.
+ */
+const PanelGeometry = (() => {
+  const EPSILON = 1e-7;
+  const PRECISION = 1e6;
+
+  function snap(value) {
+    return Math.round(value * PRECISION) / PRECISION;
+  }
+
+  function point(x, y) {
+    return { x: snap(x), y: snap(y) };
+  }
+
+  function samePoint(a, b) {
+    return a.x === b.x && a.y === b.y;
+  }
+
+  function cross(a, b, c) {
+    return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+  }
+
+  function signedArea(polygon) {
+    let area = 0;
+    for (let i = 0; i < polygon.length; i++) {
+      const a = polygon[i];
+      const b = polygon[(i + 1) % polygon.length];
+      area += a.x * b.y - b.x * a.y;
+    }
+    return area / 2;
+  }
+
+  function edges(polygon) {
+    return polygon.map((a, i) => ({ a, b: polygon[(i + 1) % polygon.length] }));
+  }
+
+  function bounds(points) {
+    return {
+      minX: Math.min(...points.map(p => p.x)),
+      maxX: Math.max(...points.map(p => p.x)),
+      minY: Math.min(...points.map(p => p.y)),
+      maxY: Math.max(...points.map(p => p.y))
+    };
+  }
+
+  function boundsOverlap(a, b, clearance = 0) {
+    return a.minX <= b.maxX + clearance && a.maxX + clearance >= b.minX &&
+      a.minY <= b.maxY + clearance && a.maxY + clearance >= b.minY;
+  }
+
+  function segmentsIntersect(a, b, c, d) {
+    if (!boundsOverlap(bounds([a, b]), bounds([c, d]))) return false;
+    return cross(a, b, c) * cross(a, b, d) <= 0 &&
+      cross(c, d, a) * cross(c, d, b) <= 0;
+  }
+
+  function pointSegmentDistanceSquared(p, a, b) {
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const lengthSquared = dx * dx + dy * dy;
+    const t = lengthSquared === 0 ? 0 : Math.max(0, Math.min(1,
+      ((p.x - a.x) * dx + (p.y - a.y) * dy) / lengthSquared));
+    return (p.x - a.x - t * dx) ** 2 + (p.y - a.y - t * dy) ** 2;
+  }
+
+  function segmentDistanceSquared(a, b, c, d) {
+    if (segmentsIntersect(a, b, c, d)) return 0;
+    return Math.min(
+      pointSegmentDistanceSquared(a, c, d),
+      pointSegmentDistanceSquared(b, c, d),
+      pointSegmentDistanceSquared(c, a, b),
+      pointSegmentDistanceSquared(d, a, b)
+    );
+  }
+
+  function pointInPolygon(p, polygon) {
+    let inside = false;
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+      const a = polygon[i];
+      const b = polygon[j];
+      if ((a.y > p.y) !== (b.y > p.y) &&
+          p.x < (b.x - a.x) * (p.y - a.y) / (b.y - a.y) + a.x) {
+        inside = !inside;
+      }
+    }
+    return inside;
+  }
+
+  function isSimplePolygon(polygon) {
+    const segments = edges(polygon);
+    for (let i = 0; i < segments.length; i++) {
+      for (let j = i + 1; j < segments.length; j++) {
+        // Neighboring edges intentionally meet at their common vertex.
+        if (j === i + 1 || (i === 0 && j === segments.length - 1)) continue;
+        if (segmentsIntersect(segments[i].a, segments[i].b,
+                              segments[j].a, segments[j].b)) return false;
+      }
+    }
+    return Math.abs(signedArea(polygon)) > EPSILON;
+  }
+
+  function polygonsHaveClearance(a, b, clearance) {
+    if (!boundsOverlap(bounds(a), bounds(b), clearance)) return true;
+    if (pointInPolygon(a[0], b) || pointInPolygon(b[0], a)) return false;
+    for (const first of edges(a)) {
+      for (const second of edges(b)) {
+        if (segmentDistanceSquared(first.a, first.b, second.a, second.b) <
+            clearance * clearance) return false;
+      }
+    }
+    return true;
+  }
+
+  return {
+    EPSILON, snap, point, samePoint, cross, signedArea, edges, bounds,
+    boundsOverlap, segmentsIntersect, segmentDistanceSquared,
+    pointInPolygon, isSimplePolygon, polygonsHaveClearance
+  };
+})();
+
+
+// ─── src/pattern.js ───
+/**
+ * Deterministic random paths → constant-width polygonal cutouts.
+ *
+ * Every cutout is a simple polygon, entirely inside the frame. Cutouts never
+ * touch or overlap, so the remaining plate is connected to its outer frame.
+ * No rasterization is involved: diagonal edges stay straight in the STL.
+ */
+const PatternGenerator = (() => {
+  const G = PanelGeometry;
+  const FRAME_MM = 12.7; // Automatic half-inch frame; never a required setting.
+  const LIMITS = {
+    length: [40, 500], width: [40, 500], thickness: [0.6, 20],
+    slitWidth: [0.6, 8], density: [0, 100], complexity: [1, 8]
+  };
+  const DEFAULTS = {
+    length: 200, width: 160, thickness: 3, slitWidth: 1.6,
+    density: 50, complexity: 5, style: 'circuit', seed: 'neon-01',
+    units: 'mm', color: 'cyan'
+  };
+  // Counterclockwise compass directions. Even indexes are orthogonal.
+  const DIRECTIONS = [
+    [1, 0], [1, 1], [0, 1], [-1, 1],
+    [-1, 0], [-1, -1], [0, -1], [1, -1]
+  ];
+
+  function validate(settings) {
+    for (const [name, [min, max]] of Object.entries(LIMITS)) {
+      if (typeof settings[name] !== 'number' || !Number.isFinite(settings[name]) ||
+          settings[name] < min || settings[name] > max) {
+        throw new Error(`${name} must be between ${min} and ${max}${
+          ['density', 'complexity'].includes(name) ? '' : ' mm'}.`);
+      }
+    }
+    if (!Number.isInteger(settings.complexity)) throw new Error('Bends must be a whole number.');
+    if (!['circuit', 'lightning', 'mixed'].includes(settings.style)) {
+      throw new Error('Choose a supported pattern style.');
+    }
+    if (typeof settings.seed !== 'string' || !settings.seed.trim() || settings.seed.length > 64) {
+      throw new Error('Enter a seed containing 1–64 characters.');
+    }
+    if (settings.units !== 'mm' && settings.units !== 'in') throw new Error('Choose mm or inches.');
+    return settings;
+  }
+
+  // FNV-1a hashes any seed string; Mulberry32 supplies portable 32-bit randomness.
+  // Do not use Math.random() here: a saved seed must recreate the same geometry.
+  function seededRandom(seed) {
+    let state = 2166136261;
+    for (let i = 0; i < seed.length; i++) {
+      state = Math.imul(state ^ seed.charCodeAt(i), 16777619);
+    }
+    return function random() {
+      state = (state + 0x6D2B79F5) | 0;
+      let value = Math.imul(state ^ (state >>> 15), 1 | state);
+      value ^= value + Math.imul(value ^ (value >>> 7), 61 | value);
+      return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function pathSegments(path) {
+    return path.slice(1).map((b, i) => ({ a: path[i], b }));
+  }
+
+  function offsetPath(path, width) {
+    const halfWidth = width / 2;
+    const normals = pathSegments(path).map(({ a, b }) => {
+      const length = Math.hypot(b.x - a.x, b.y - a.y);
+      return { x: -(b.y - a.y) / length, y: (b.x - a.x) / length };
+    });
+
+    function side(sign) {
+      return path.map((p, i) => {
+        const before = normals[Math.max(0, i - 1)];
+        const after = normals[Math.min(normals.length - 1, i)];
+        // Intersection of the two offset lines: a sharp, mitered join.
+        // Turns are limited to 90°, keeping the corner extension bounded.
+        const factor = sign * halfWidth / (1 + before.x * after.x + before.y * after.y);
+        return G.point(p.x + (before.x + after.x) * factor,
+                       p.y + (before.y + after.y) * factor);
+      });
+    }
+
+    const polygon = side(1).concat(side(-1).reverse());
+    return G.signedArea(polygon) < 0 ? polygon : polygon.reverse();
+  }
+
+  function canAddSegment(path, end, occupiedSegments, clearance) {
+    const start = path[path.length - 1];
+    const candidateBounds = G.bounds([start, end]);
+    // Skip only the immediately preceding segment, which shares this endpoint.
+    const otherSegments = occupiedSegments.concat(pathSegments(path).slice(0, -1));
+    return otherSegments.every(({ a, b }) =>
+      !G.boundsOverlap(candidateBounds, G.bounds([a, b]), clearance) ||
+      G.segmentDistanceSquared(start, end, a, b) >= clearance * clearance);
+  }
+
+  function generate(settings) {
+    validate(settings);
+    const random = seededRandom(settings.seed);
+    const integer = (min, max) => min + Math.floor(random() * (max - min + 1));
+    const pick = values => values[integer(0, values.length - 1)];
+    const minimumWeb = Math.max(2.4, settings.slitWidth);
+    const miterRadius = settings.slitWidth / Math.sqrt(2);
+    const clearance = 2 * miterRadius + minimumWeb + 0.05;
+    const margin = FRAME_MM + miterRadius + 0.01;
+    const availableX = settings.length - 2 * margin;
+    const availableY = settings.width - 2 * margin;
+    const gridStep = Math.max(clearance * 1.35, Math.min(availableX, availableY) / 12);
+    const columns = Math.floor(availableX / gridStep);
+    const rows = Math.floor(availableY / gridStep);
+    const originX = (settings.length - columns * gridStep) / 2;
+    const originY = (settings.width - rows * gridStep) / 2;
+    const usableArea = (settings.length - 2 * FRAME_MM) * (settings.width - 2 * FRAME_MM);
+    const targetArea = usableArea * (0.025 + settings.density * 0.0011);
+    const paths = [];
+    const holes = [];
+    const occupiedSegments = [];
+    let openArea = 0;
+
+    for (let attempt = 0; attempt < 700 && openArea < targetArea && holes.length < 90; attempt++) {
+      const style = settings.style === 'mixed' ? pick(['circuit', 'lightning']) : settings.style;
+      let direction = pick(style === 'circuit' ? [0, 2, 4, 6] : [1, 3, 5, 7]);
+      let column = integer(0, columns);
+      let row = integer(0, rows);
+      const path = [G.point(originX + column * gridStep, originY + row * gridStep)];
+      const wantedSegments = integer(2, settings.complexity + 2);
+
+      for (let segment = 0; segment < wantedSegments; segment++) {
+        let added = false;
+        for (let trial = 0; trial < 10; trial++) {
+          const turn = segment === 0 ? 0 :
+            style === 'circuit' ? pick([-2, 2]) : pick([-2, -1, 1, 2]);
+          const nextDirection = (direction + turn + 8) % 8;
+          const [dx, dy] = DIRECTIONS[nextDirection];
+          const steps = integer(1, 3);
+          const nextColumn = column + dx * steps;
+          const nextRow = row + dy * steps;
+          if (nextColumn < 0 || nextColumn > columns || nextRow < 0 || nextRow > rows) continue;
+          const end = G.point(originX + nextColumn * gridStep, originY + nextRow * gridStep);
+          if (!canAddSegment(path, end, occupiedSegments, clearance)) continue;
+          path.push(end);
+          column = nextColumn;
+          row = nextRow;
+          direction = nextDirection;
+          added = true;
+          break;
+        }
+        if (!added) break;
+      }
+
+      if (path.length < 2) continue;
+      const hole = offsetPath(path, settings.slitWidth);
+      if (!G.isSimplePolygon(hole)) continue;
+      if (hole.some(p => p.x < FRAME_MM || p.x > settings.length - FRAME_MM ||
+                         p.y < FRAME_MM || p.y > settings.width - FRAME_MM)) continue;
+      if (!holes.every(other => G.polygonsHaveClearance(hole, other, minimumWeb))) continue;
+
+      paths.push(path);
+      holes.push(hole);
+      occupiedSegments.push(...pathSegments(path));
+      openArea += Math.abs(G.signedArea(hole));
+    }
+
+    return {
+      settings: { ...settings }, paths, holes, openArea, minimumWeb,
+      openPercent: 100 * openArea / (settings.length * settings.width),
+      densityLimited: openArea < targetArea * 0.85,
+      volume: (settings.length * settings.width - openArea) * settings.thickness
+    };
+  }
+
+  return { DEFAULTS, LIMITS, FRAME_MM, validate, seededRandom, offsetPath, generate };
+})();
+
+
+// ─── src/mesh.js ───
+/**
+ * Watertight extrusion without dependencies or polygon-boolean libraries.
+ *
+ * Slice the panel into horizontal bands at every polygon vertex. Within each
+ * band, the material consists of convex trapezoids, which are easy to mesh.
+ * Split EVERY horizontal edge at the same row coordinates to avoid T-junctions
+ * where bands meet. Apply the same splits to the hole walls and outer walls.
+ *
+ * Returned positions are an unindexed list of triangles, counterclockwise
+ * when viewed from outside the solid. STL has no unit field; values are in mm.
+ */
+const MeshBuilder = (() => {
+  const G = PanelGeometry;
+
+  function uniqueSorted(values) {
+    return [...new Set(values.map(G.snap))].sort((a, b) => a - b);
+  }
+
+  function xAtY(edge, y) {
+    if (y === edge.a.y) return edge.a.x;
+    if (y === edge.b.y) return edge.b.x;
+    return G.snap(edge.a.x + (y - edge.a.y) *
+      (edge.b.x - edge.a.x) / (edge.b.y - edge.a.y));
+  }
+
+  function build(pattern) {
+    const { length, width, thickness } = pattern.settings;
+    const outer = [G.point(0, 0), G.point(length, 0), G.point(length, width), G.point(0, width)];
+    // Outer ring is CCW; each hole is CW. Material always lies left of an edge.
+    const contours = [outer, ...pattern.holes];
+    const edges = contours.flatMap(G.edges);
+    const levels = uniqueSorted(contours.flatMap(polygon => polygon.map(p => p.y)));
+    const rows = levels.map(y => ({
+      y,
+      xs: uniqueSorted(edges.flatMap(edge => {
+        if (y < Math.min(edge.a.y, edge.b.y) || y > Math.max(edge.a.y, edge.b.y)) return [];
+        return edge.a.y === edge.b.y ? [edge.a.x, edge.b.x] : [xAtY(edge, y)];
+      }))
+    }));
+    const rowLookup = new Map(rows.map(row => [row.y, row]));
+    const positions = [];
+
+    function triangle(a, b, c) {
+      positions.push(...a, ...b, ...c);
+    }
+
+    function horizontalPoints(row, left, right) {
+      return row.xs.filter(x => x >= left && x <= right).map(x => G.point(x, row.y));
+    }
+
+    function cap(ring) {
+      const cleaned = ring.filter((p, i) => i === 0 || !G.samePoint(p, ring[i - 1]));
+      if (cleaned.length > 1 && G.samePoint(cleaned[0], cleaned[cleaned.length - 1])) cleaned.pop();
+      if (cleaned.length < 3 || Math.abs(G.signedArea(cleaned)) < G.EPSILON) return;
+      // A fan through an interior point preserves every collinear edge vertex.
+      const center = G.point(
+        cleaned.reduce((sum, p) => sum + p.x, 0) / cleaned.length,
+        cleaned.reduce((sum, p) => sum + p.y, 0) / cleaned.length
+      );
+      for (let i = 0; i < cleaned.length; i++) {
+        const a = cleaned[i];
+        const b = cleaned[(i + 1) % cleaned.length];
+        triangle([center.x, center.y, thickness], [a.x, a.y, thickness], [b.x, b.y, thickness]);
+        triangle([center.x, center.y, 0], [b.x, b.y, 0], [a.x, a.y, 0]);
+      }
+    }
+
+    for (let band = 0; band < rows.length - 1; band++) {
+      const bottom = rows[band];
+      const top = rows[band + 1];
+      const middleY = (bottom.y + top.y) / 2;
+      const crossings = edges
+        .filter(edge => middleY > Math.min(edge.a.y, edge.b.y) &&
+                        middleY < Math.max(edge.a.y, edge.b.y))
+        .map(edge => ({ edge, x: xAtY(edge, middleY) }))
+        .sort((a, b) => a.x - b.x);
+      if (crossings.length % 2 !== 0) throw new Error('Invalid polygon crossings.');
+
+      // Even/odd filling: material, hole, material, hole, …
+      for (let i = 0; i < crossings.length; i += 2) {
+        const left = crossings[i].edge;
+        const right = crossings[i + 1].edge;
+        const lower = horizontalPoints(bottom, xAtY(left, bottom.y), xAtY(right, bottom.y));
+        const upper = horizontalPoints(top, xAtY(left, top.y), xAtY(right, top.y));
+        cap(lower.concat(upper.reverse()));
+      }
+    }
+
+    function wall(a, b) {
+      if (G.samePoint(a, b)) return;
+      triangle([a.x, a.y, 0], [b.x, b.y, 0], [b.x, b.y, thickness]);
+      triangle([a.x, a.y, 0], [b.x, b.y, thickness], [a.x, a.y, thickness]);
+    }
+
+    for (const edge of edges) {
+      let points;
+      if (edge.a.y === edge.b.y) {
+        points = horizontalPoints(rowLookup.get(edge.a.y),
+          Math.min(edge.a.x, edge.b.x), Math.max(edge.a.x, edge.b.x));
+        if (edge.a.x > edge.b.x) points.reverse();
+      } else {
+        points = levels
+          .filter(y => y >= Math.min(edge.a.y, edge.b.y) && y <= Math.max(edge.a.y, edge.b.y))
+          .map(y => G.point(xAtY(edge, y), y));
+        if (edge.a.y > edge.b.y) points.reverse();
+      }
+      for (let i = 0; i < points.length - 1; i++) wall(points[i], points[i + 1]);
+    }
+
+    return { positions: new Float32Array(positions), triangleCount: positions.length / 9 };
+  }
+
+  function normalAt(positions, offset) {
+    const ux = positions[offset + 3] - positions[offset];
+    const uy = positions[offset + 4] - positions[offset + 1];
+    const uz = positions[offset + 5] - positions[offset + 2];
+    const vx = positions[offset + 6] - positions[offset];
+    const vy = positions[offset + 7] - positions[offset + 1];
+    const vz = positions[offset + 8] - positions[offset + 2];
+    const nx = uy * vz - uz * vy;
+    const ny = uz * vx - ux * vz;
+    const nz = ux * vy - uy * vx;
+    const magnitude = Math.hypot(nx, ny, nz);
+    return magnitude === 0 ? [0, 0, 0] : [nx / magnitude, ny / magnitude, nz / magnitude];
+  }
+
+  function binarySTL(mesh) {
+    const buffer = new ArrayBuffer(84 + mesh.triangleCount * 50);
+    const view = new DataView(buffer);
+    const header = new TextEncoder().encode('Light Pattern Generator | millimeters | offline');
+    new Uint8Array(buffer, 0, header.length).set(header);
+    view.setUint32(80, mesh.triangleCount, true);
+    let offset = 84;
+    for (let i = 0; i < mesh.positions.length; i += 9) {
+      for (const value of normalAt(mesh.positions, i)) {
+        view.setFloat32(offset, value, true);
+        offset += 4;
+      }
+      for (let j = 0; j < 9; j++) {
+        view.setFloat32(offset, mesh.positions[i + j], true);
+        offset += 4;
+      }
+      view.setUint16(offset, 0, true);
+      offset += 2;
+    }
+    return buffer;
+  }
+
+  return { build, binarySTL, normalAt };
+})();
+
+
+// ─── src/preview.js ───
+/**
+ * Canvas preview, including a small orthographic 3D renderer.
+ * The 3D view draws the same triangles that go into the STL, not a mock model.
+ * Keeping this on Canvas 2D avoids WebGL, CDN libraries, and GPU requirements.
+ */
+const PanelPreview = (() => {
+  const COLORS = { cyan: '#45f4ef', violet: '#ad8aff', amber: '#ffbf66' };
+
+  class Preview {
+    constructor(canvas) {
+      this.canvas = canvas;
+      this.context = canvas.getContext('2d');
+      this.pattern = null;
+      this.mesh = null;
+      this.mode = 'light';
+      this.color = 'cyan';
+      this.yaw = -0.28;
+      this.tilt = 0.65;
+      this.zoom = 1;
+      this.frame = null;
+      this.drag = null;
+      this.resizeObserver = new ResizeObserver(() => this.scheduleDraw());
+      this.resizeObserver.observe(canvas);
+      this.bindPointerEvents();
+    }
+
+    update(pattern, mesh) {
+      this.pattern = pattern;
+      this.mesh = mesh;
+      this.scheduleDraw();
+    }
+
+    setMode(mode) {
+      this.mode = mode;
+      this.canvas.classList.toggle('draggable', mode === '3d');
+      this.canvas.setAttribute('aria-label', mode === '3d' ?
+        '3D preview of the exported panel. Drag to rotate; scroll to zoom.' :
+        `${mode === 'light' ? 'Backlit' : 'Cutout'} preview of the generated panel.`);
+      this.scheduleDraw();
+    }
+
+    resetView() {
+      this.yaw = -0.28;
+      this.tilt = 0.65;
+      this.zoom = 1;
+      this.scheduleDraw();
+    }
+
+    bindPointerEvents() {
+      this.canvas.addEventListener('pointerdown', event => {
+        if (this.mode !== '3d') return;
+        this.drag = { x: event.clientX, y: event.clientY };
+        this.canvas.setPointerCapture(event.pointerId);
+      });
+      this.canvas.addEventListener('pointermove', event => {
+        if (!this.drag) return;
+        this.yaw += (event.clientX - this.drag.x) * 0.007;
+        this.tilt = Math.max(0.1, Math.min(1.25, this.tilt + (event.clientY - this.drag.y) * 0.007));
+        this.drag = { x: event.clientX, y: event.clientY };
+        this.scheduleDraw();
+      });
+      for (const name of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+        this.canvas.addEventListener(name, () => { this.drag = null; });
+      }
+      this.canvas.addEventListener('wheel', event => {
+        if (this.mode !== '3d') return;
+        event.preventDefault();
+        this.zoom = Math.max(0.5, Math.min(2.5, this.zoom * Math.exp(-event.deltaY * 0.001)));
+        this.scheduleDraw();
+      }, { passive: false });
+    }
+
+    scheduleDraw() {
+      if (this.frame !== null) return;
+      this.frame = requestAnimationFrame(() => {
+        this.frame = null;
+        this.draw();
+      });
+    }
+
+    draw() {
+      const rect = this.canvas.getBoundingClientRect();
+      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      this.canvas.width = Math.round(rect.width * ratio);
+      this.canvas.height = Math.round(rect.height * ratio);
+      const ctx = this.context;
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      ctx.clearRect(0, 0, rect.width, rect.height);
+      const gradient = ctx.createRadialGradient(rect.width / 2, rect.height / 2, 0,
+        rect.width / 2, rect.height / 2, Math.max(rect.width, rect.height) * 0.6);
+      gradient.addColorStop(0, '#15272d');
+      gradient.addColorStop(1, '#080f13');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, rect.width, rect.height);
+      // A quiet workbench grid, independent of display scale.
+      ctx.strokeStyle = '#8caab909';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < rect.width; x += 28) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, rect.height); ctx.stroke();
+      }
+      for (let y = 0; y < rect.height; y += 28) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(rect.width, y); ctx.stroke();
+      }
+      if (!this.pattern) return;
+      if (this.mode === '3d') this.draw3D(rect.width, rect.height);
+      else this.drawFlat(rect.width, rect.height);
+    }
+
+    drawFlat(viewWidth, viewHeight) {
+      const ctx = this.context;
+      const { length, width } = this.pattern.settings;
+      const scale = Math.min((viewWidth - 90) / length, (viewHeight - 105) / width);
+      const x = (viewWidth - length * scale) / 2;
+      const y = (viewHeight - width * scale) / 2 - 6;
+      const holes = new Path2D();
+      for (const polygon of this.pattern.holes) {
+        polygon.forEach((p, i) => {
+          const method = i === 0 ? 'moveTo' : 'lineTo';
+          holes[method](x + p.x * scale, y + p.y * scale);
+        });
+        holes.closePath();
+      }
+      ctx.save();
+      ctx.shadowColor = '#0009';
+      ctx.shadowBlur = 25;
+      ctx.shadowOffsetY = 12;
+      ctx.fillStyle = this.mode === 'light' ? '#11191d' : '#738c96';
+      ctx.fillRect(x, y, length * scale, width * scale);
+      ctx.restore();
+      ctx.strokeStyle = this.mode === 'light' ? '#2d4149' : '#aac2cc';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x, y, length * scale, width * scale);
+
+      if (this.mode === 'light') {
+        ctx.save();
+        ctx.fillStyle = COLORS[this.color];
+        ctx.shadowColor = COLORS[this.color];
+        ctx.shadowBlur = 16;
+        ctx.fill(holes);
+        ctx.shadowBlur = 7;
+        ctx.fill(holes);
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#d8fffa';
+        ctx.globalAlpha = 0.7;
+        ctx.fill(holes);
+        ctx.restore();
+      } else {
+        ctx.fillStyle = '#0a141a';
+        ctx.fill(holes);
+      }
+
+      ctx.fillStyle = '#78949f';
+      ctx.font = '10px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+      ctx.textAlign = 'center';
+      const units = this.pattern.settings.units;
+      const dimension = value => `${Number((units === 'in' ? value / 25.4 : value).toFixed(2))} ${units}`;
+      ctx.fillText(dimension(length), viewWidth / 2, y + width * scale + 23);
+      ctx.save();
+      ctx.translate(x - 17, y + width * scale / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText(dimension(width), 0, 0);
+      ctx.restore();
+    }
+
+    draw3D(viewWidth, viewHeight) {
+      if (!this.mesh) return;
+      const ctx = this.context;
+      const { length, width, thickness } = this.pattern.settings;
+      const cosYaw = Math.cos(this.yaw), sinYaw = Math.sin(this.yaw);
+      const cosTilt = Math.cos(this.tilt), sinTilt = Math.sin(this.tilt);
+      const projectedWidth = Math.abs(length * cosYaw) + Math.abs(width * sinYaw);
+      const projectedHeight = (Math.abs(length * sinYaw) + Math.abs(width * cosYaw)) *
+        cosTilt + thickness * sinTilt;
+      const scale = Math.min((viewWidth - 95) / projectedWidth,
+        (viewHeight - 115) / projectedHeight) * this.zoom;
+      const origin = { x: viewWidth / 2, y: viewHeight / 2 - 8 };
+
+      const project = (x, y, z) => {
+        x -= length / 2;
+        y -= width / 2;
+        z -= thickness / 2;
+        const rotatedX = x * cosYaw - y * sinYaw;
+        const rotatedY = x * sinYaw + y * cosYaw;
+        return {
+          x: origin.x + rotatedX * scale,
+          y: origin.y + (rotatedY * cosTilt - z * sinTilt) * scale,
+          depth: rotatedY * sinTilt + z * cosTilt
+        };
+      };
+      const faces = [];
+      const topSurface = new Path2D();
+      const positions = this.mesh.positions;
+      for (let i = 0; i < positions.length; i += 9) {
+        const normal = MeshBuilder.normalAt(positions, i);
+        const rotatedNormalY = normal[0] * sinYaw + normal[1] * cosYaw;
+        if (rotatedNormalY * sinTilt + normal[2] * cosTilt <= 0) continue;
+        const points = [0, 3, 6].map(j => project(positions[i + j], positions[i + j + 1], positions[i + j + 2]));
+        if (normal[2] > 0.99) {
+          // Fill all coplanar triangles together so antialiasing does not expose
+          // their internal edges. Hole/exterior walls remain separate below.
+          points.forEach((p, j) => j === 0 ? topSurface.moveTo(p.x, p.y) : topSurface.lineTo(p.x, p.y));
+          topSurface.closePath();
+          continue;
+        }
+        const shade = Math.max(0, normal[0] * -0.25 + normal[1] * -0.4 + normal[2] * 0.85);
+        faces.push({ points, depth: points.reduce((sum, p) => sum + p.depth, 0) / 3,
+          color: `rgb(${Math.round(54 + shade * 77)},${Math.round(74 + shade * 95)},${Math.round(81 + shade * 99)})` });
+      }
+      faces.sort((a, b) => a.depth - b.depth);
+      ctx.lineWidth = 0.55;
+      for (const face of faces) {
+        ctx.beginPath();
+        face.points.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+        ctx.closePath();
+        ctx.fillStyle = face.color;
+        ctx.strokeStyle = face.color;
+        ctx.fill();
+        ctx.stroke(); // Same-color stroke covers subpixel cracks between triangles.
+      }
+      ctx.fillStyle = 'rgb(119,155,165)';
+      ctx.fill(topSurface);
+    }
+  }
+
+  return { Preview, COLORS };
+})();
+
+
+// ─── src/app.js ───
+/**
+ * UI wiring. Model values stay in millimeters; inches are display-only.
+ * This file deliberately uses plain DOM APIs and named functions.
+ */
+(() => {
+  const P = PatternGenerator;
+  const $ = id => document.getElementById(id);
+  const dimensionNames = ['length', 'width', 'thickness', 'slitWidth'];
+  const form = $('settings-form');
+  const preview = new PanelPreview.Preview($('preview'));
+  let settings = { ...P.DEFAULTS };
+  let pattern = null;
+  let mesh = null;
+  let pendingUpdate = null;
+  let canExport = false;
+
+  function displayNumber(value) {
+    const converted = settings.units === 'in' ? value / 25.4 : value;
+    // More digits prevent repeated unit switches from rounding model values.
+    return Number(converted.toFixed(settings.units === 'in' ? 4 : 3));
+  }
+
+  function updateUnitButtons() {
+    for (const button of document.querySelectorAll('[data-unit]')) {
+      button.setAttribute('aria-pressed', String(button.dataset.unit === settings.units));
+    }
+    document.querySelectorAll('.unit-label').forEach(label => { label.textContent = settings.units; });
+  }
+
+  function writeDimensions() {
+    for (const name of dimensionNames) {
+      const input = $(name);
+      input.value = displayNumber(settings[name]);
+      // Validate exact mm values ourselves. Decimal inch limits require rounding.
+      input.step = 'any';
+      const [min, max] = P.LIMITS[name];
+      input.title = settings.units === 'in' ?
+        `${(min / 25.4).toFixed(3)}–${(max / 25.4).toFixed(3)} inches` : `${min}–${max} mm`;
+    }
+    updateUnitButtons();
+  }
+
+  function writeForm() {
+    writeDimensions();
+    for (const name of ['style', 'density', 'complexity', 'seed']) $(name).value = settings[name];
+    updateRangeLabels();
+    updateColor(settings.color);
+  }
+
+  function updateRangeLabels() {
+    $('density-value').value = `${$('density').value}%`;
+    $('complexity-value').value = $('complexity').value;
+  }
+
+  function readForm() {
+    const next = { ...settings };
+    for (const name of dimensionNames) {
+      const displayed = Number($(name).value);
+      // Preserve precise mm values when an input is simply displaying inches.
+      next[name] = $(name).value.trim() === '' ? NaN :
+        displayed === displayNumber(settings[name]) ? settings[name] :
+        PanelGeometry.snap(displayed * (settings.units === 'in' ? 25.4 : 1));
+    }
+    next.style = $('style').value;
+    next.density = Number($('density').value);
+    next.complexity = Number($('complexity').value);
+    next.seed = $('seed').value.trim();
+    return next;
+  }
+
+  function showStatus(message, isError = false) {
+    $('status').textContent = message;
+    $('status').classList.toggle('error', isError);
+  }
+
+  function markInvalidInputs(next) {
+    for (const name of dimensionNames) {
+      const [min, max] = P.LIMITS[name];
+      $(name).setAttribute('aria-invalid', String(!Number.isFinite(next[name]) || next[name] < min || next[name] > max));
+    }
+    $('seed').setAttribute('aria-invalid', String(!next.seed.trim()));
+  }
+
+  function updateStats() {
+    const s = pattern.settings;
+    $('size-stat').textContent = `${[s.length, s.width, s.thickness].map(displayNumber).join(' × ')} ${settings.units}`;
+    $('opening-stat').textContent = `${pattern.openPercent.toFixed(1)}% open`;
+    $('paths-stat').textContent = String(pattern.holes.length);
+  }
+
+  function rememberSettings() {
+    try { localStorage.setItem('light-pattern-settings-v1', JSON.stringify(settings)); }
+    catch { /* File URLs/private browsing may disable storage. Save/load still works. */ }
+  }
+
+  function regenerate() {
+    clearTimeout(pendingUpdate);
+    pendingUpdate = null;
+    const next = readForm();
+    markInvalidInputs(next);
+    try {
+      P.validate(next);
+      const generated = P.generate(next);
+      const generatedMesh = MeshBuilder.build(generated);
+      settings = next;
+      pattern = generated;
+      mesh = generatedMesh;
+      preview.update(pattern, mesh);
+      canExport = true;
+      $('export-stl').disabled = false;
+      updateStats();
+      rememberSettings();
+      if (pattern.holes.length === 0) {
+        showStatus('No slits fit these dimensions. Enlarge the panel or reduce the slit width.');
+      } else if (pattern.densityLimited) {
+        showStatus('Spacing limits the density for this size. Try narrower slits or a larger panel for more lines.');
+      } else {
+        showStatus('');
+      }
+      return true;
+    } catch (error) {
+      canExport = false;
+      $('export-stl').disabled = true;
+      showStatus(`${error.message} The preview shows the last valid panel.`, true);
+      return false;
+    }
+  }
+
+  function scheduleRegenerate() {
+    updateRangeLabels();
+    canExport = false;
+    $('export-stl').disabled = true;
+    clearTimeout(pendingUpdate);
+    pendingUpdate = setTimeout(regenerate, 160);
+  }
+
+  function setUnits(units) {
+    // Commit edits in the old units first, then only change the display.
+    if (!regenerate()) return;
+    settings.units = units;
+    pattern.settings.units = units;
+    writeDimensions();
+    updateStats();
+    preview.scheduleDraw();
+    rememberSettings();
+  }
+
+  function updateColor(color) {
+    if (!Object.hasOwn(PanelPreview.COLORS, color)) return;
+    settings.color = color;
+    preview.color = color;
+    for (const button of document.querySelectorAll('[data-color]')) {
+      button.setAttribute('aria-pressed', String(button.dataset.color === color));
+    }
+    preview.scheduleDraw();
+  }
+
+  function fileName(extension) {
+    const seed = settings.seed.replace(/[^a-z0-9_-]/gi, '-').slice(0, 32) || 'pattern';
+    return `light-panel-${seed}.${extension}`;
+  }
+
+  function download(blob, name) {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = name;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+  }
+
+  function exportSTL() {
+    if (!regenerate() || !canExport) return;
+    download(new Blob([MeshBuilder.binarySTL(mesh)], { type: 'application/octet-stream' }), fileName('stl'));
+    showStatus(`Downloaded STL · ${mesh.triangleCount.toLocaleString()} triangles · millimeters. Open it in your slicer to check bed fit.`);
+  }
+
+  function saveSettings() {
+    if (!regenerate()) return;
+    download(new Blob([JSON.stringify({
+      format: 'light-pattern-generator', version: 1, settings
+    }, null, 2) + '\n'], { type: 'application/json' }), fileName('json'));
+  }
+
+  function checkedSettings(candidate) {
+    if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) {
+      throw new Error('The settings file must contain a settings object.');
+    }
+    // Pick known properties instead of copying arbitrary imported keys.
+    const next = Object.fromEntries(Object.keys(P.DEFAULTS).map(key =>
+      [key, candidate[key] === undefined ? P.DEFAULTS[key] : candidate[key]]));
+    P.validate(next);
+    if (!Object.hasOwn(PanelPreview.COLORS, next.color)) throw new Error('Choose a supported light color.');
+    return next;
+  }
+
+  async function loadSettings(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    try {
+      if (file.size > 65536) throw new Error('Settings files must be smaller than 64 KB.');
+      const saved = JSON.parse(await file.text());
+      if (saved.format !== 'light-pattern-generator' || saved.version !== 1) {
+        throw new Error('This is not a supported Light Pattern settings file.');
+      }
+      settings = checkedSettings(saved.settings);
+      writeForm();
+      regenerate();
+    } catch (error) {
+      showStatus(`Could not load settings: ${error.message}`, true);
+    } finally {
+      event.target.value = '';
+    }
+  }
+
+  function restoreLastSession() {
+    try {
+      const saved = localStorage.getItem('light-pattern-settings-v1');
+      if (saved) settings = checkedSettings(JSON.parse(saved));
+    } catch { /* Corrupt or unavailable storage: use the defaults. */ }
+  }
+
+  form.addEventListener('input', scheduleRegenerate);
+  form.addEventListener('change', regenerate);
+  form.addEventListener('submit', event => { event.preventDefault(); regenerate(); });
+  $('shuffle').addEventListener('click', () => {
+    const bytes = new Uint32Array(1);
+    crypto.getRandomValues(bytes);
+    $('seed').value = `glow-${bytes[0].toString(36)}`;
+    regenerate();
+  });
+  $('reset').addEventListener('click', () => {
+    settings = { ...P.DEFAULTS };
+    writeForm();
+    regenerate();
+  });
+  for (const button of document.querySelectorAll('[data-unit]')) {
+    button.addEventListener('click', () => setUnits(button.dataset.unit));
+  }
+  for (const button of document.querySelectorAll('[data-view]')) {
+    button.addEventListener('click', () => {
+      const mode = button.dataset.view;
+      preview.setMode(mode);
+      document.querySelectorAll('[data-view]').forEach(item =>
+        item.setAttribute('aria-pressed', String(item === button)));
+      $('reset-view').hidden = mode !== '3d';
+      $('preview-caption').textContent = mode === '3d' ? 'Drag to rotate · scroll to zoom' :
+        mode === 'light' ? 'Backlit preview · color is illustrative' : 'Solid panel · slits cut all the way through';
+      $('preview-stage').style.touchAction = mode === '3d' ? 'none' : 'auto';
+    });
+  }
+  for (const button of document.querySelectorAll('[data-color]')) {
+    button.addEventListener('click', () => { updateColor(button.dataset.color); rememberSettings(); });
+  }
+  $('reset-view').addEventListener('click', () => preview.resetView());
+  $('export-stl').addEventListener('click', exportSTL);
+  $('save-settings').addEventListener('click', saveSettings);
+  $('load-settings').addEventListener('click', () => $('settings-file').click());
+  $('settings-file').addEventListener('change', loadSettings);
+
+  restoreLastSession();
+  writeForm();
+  regenerate();
+})();
+</script>
+</body>
+</html>

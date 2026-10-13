@@ -1,0 +1,10 @@
+{
+  "name": "light-pattern-generator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "An offline, dependency-free generator for printable light panels.",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/geometry.test.mjs"
+  }
+}
