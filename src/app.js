@@ -5,7 +5,7 @@
 (() => {
   const P = PatternGenerator;
   const $ = id => document.getElementById(id);
-  const dimensionNames = ['length', 'width', 'thickness', 'slitWidth', 'minSlitLength'];
+  const dimensionNames = ['length', 'width', 'thickness', 'borderWidth', 'slitWidth', 'minSlitLength'];
   const form = $('settings-form');
   const preview = new PanelPreview.Preview($('preview'));
   let settings = { ...P.DEFAULTS };
@@ -76,7 +76,8 @@
   function markInvalidInputs(next) {
     for (const name of dimensionNames) {
       const [min, max] = P.LIMITS[name];
-      $(name).setAttribute('aria-invalid', String(!Number.isFinite(next[name]) || next[name] < min || next[name] > max));
+      const consumesPanel = name === 'borderWidth' && next.borderWidth * 2 >= Math.min(next.length, next.width);
+      $(name).setAttribute('aria-invalid', String(!Number.isFinite(next[name]) || next[name] < min || next[name] > max || consumesPanel));
     }
     $('seed').setAttribute('aria-invalid', String(!next.seed.trim()));
   }
@@ -111,7 +112,7 @@
       updateStats();
       rememberSettings();
       if (pattern.holes.length === 0) {
-        showStatus('No slits fit these settings. Enlarge the panel, reduce the slit width or minimum length, or allow more bends.');
+        showStatus('No slits fit these settings. Enlarge the panel, reduce the border, slit width or minimum length, or allow more bends.');
       } else if (pattern.densityLimited) {
         showStatus('Spacing and minimum length limit the density for this size. Try narrower slits, a lower minimum length, or a larger panel for more lines.');
       } else {
@@ -191,9 +192,12 @@
     // Pick known properties instead of copying arbitrary imported keys.
     const next = Object.fromEntries(Object.keys(P.DEFAULTS).map(key =>
       [key, candidate[key] === undefined ? P.DEFAULTS[key] : candidate[key]]));
-    // Old downloaded designs had no minimum. Keep their exact seeded geometry
-    // when imported; old browser sessions adopt the new default instead.
-    if (preserveLegacyPattern && candidate.minSlitLength === undefined) next.minSlitLength = 0;
+    // Keep downloaded designs' original geometry when importing older files.
+    // Browser sessions without the new fields adopt the improved defaults.
+    if (preserveLegacyPattern) {
+      if (candidate.minSlitLength === undefined) next.minSlitLength = 0;
+      if (candidate.borderWidth === undefined) next.borderWidth = P.LEGACY_BORDER_MM;
+    }
     P.validate(next);
     if (!Object.hasOwn(PanelPreview.COLORS, next.color)) throw new Error('Choose a supported light color.');
     return next;

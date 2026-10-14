@@ -115,13 +115,18 @@ try {
   assert.ok(await evaluate('Number(document.querySelector("#paths-stat").textContent) > 0'));
   assert.equal(await evaluate('document.querySelector("#export-stl").disabled'), false);
   assert.equal(await evaluate('document.querySelector("#minSlitLength").value'), '30');
+  assert.equal(await evaluate('document.querySelector("#borderWidth").value'), '6');
   await screenshot('desktop-backlit.png');
 
   await click('[data-unit="in"]');
   assert.equal(await evaluate('document.querySelector("#length").value'), '7.874');
   assert.equal(await evaluate('document.querySelector("#minSlitLength").value'), '1.1811');
+  assert.equal(await evaluate('document.querySelector("#borderWidth").value'), '0.2362');
+  await evaluate(`document.querySelector('#borderWidth').value = '0.25'; document.querySelector('#borderWidth').dispatchEvent(new Event('change', {bubbles:true}))`);
   await click('[data-unit="mm"]');
   assert.equal(await evaluate('document.querySelector("#length").value'), '200');
+  assert.equal(await evaluate('document.querySelector("#borderWidth").value'), '6.35');
+  await click('#reset');
   // Changing a unit display must not round the internal model dimensions.
   await evaluate(`document.querySelector('#length').value = '173.237'; document.querySelector('#length').dispatchEvent(new Event('change', {bubbles:true}))`);
   for (let i = 0; i < 5; i++) { await click('[data-unit="in"]'); await click('[data-unit="mm"]'); }
@@ -136,6 +141,21 @@ try {
   await evaluate(`document.querySelector('#minSlitLength').value = '-1'; document.querySelector('#minSlitLength').dispatchEvent(new Event('change', {bubbles:true}))`);
   assert.equal(await evaluate('document.querySelector("#export-stl").disabled'), true);
   assert.equal(await evaluate('document.querySelector("#minSlitLength").getAttribute("aria-invalid")'), 'true');
+  await click('#reset');
+  await evaluate(`document.querySelector('#borderWidth').value = '0'; document.querySelector('#borderWidth').dispatchEvent(new Event('change', {bubbles:true}))`);
+  assert.equal(await evaluate('document.querySelector("#export-stl").disabled'), true);
+  assert.equal(await evaluate('document.querySelector("#borderWidth").getAttribute("aria-invalid")'), 'true');
+  await click('#reset');
+  await evaluate(`document.querySelector('#length').value = '40'; document.querySelector('#borderWidth').value = '20';
+    document.querySelector('#borderWidth').dispatchEvent(new Event('change', {bubbles:true}))`);
+  assert.equal(await evaluate('document.querySelector("#export-stl").disabled'), true);
+  assert.equal(await evaluate('document.querySelector("#borderWidth").getAttribute("aria-invalid")'), 'true');
+  assert.ok(await evaluate('document.querySelector("#status").textContent.includes("less than half")'));
+  await click('#reset');
+  await evaluate(`for (const [id,value] of Object.entries({length:40,width:40,borderWidth:19,slitWidth:8})) document.getElementById(id).value = value;
+    document.querySelector('#borderWidth').dispatchEvent(new Event('change', {bubbles:true}))`);
+  assert.equal(await evaluate('document.querySelector("#paths-stat").textContent'), '0');
+  assert.equal(await evaluate('document.querySelector("#export-stl").disabled'), false);
   await click('#reset');
   await evaluate(`for (const [id,value] of Object.entries({length:40,width:40,minSlitLength:1000})) document.getElementById(id).value = value;
     document.querySelector('#minSlitLength').dispatchEvent(new Event('change', {bubbles:true}))`);
@@ -173,8 +193,10 @@ try {
   // Verify the new setting changes actual exported geometry, survives display
   // unit switching without rounding, and persists through save/load.
   await evaluate(`document.querySelector('#minSlitLength').value = '60.125'; document.querySelector('#minSlitLength').dispatchEvent(new Event('change', {bubbles:true}))`);
+  await evaluate(`document.querySelector('#borderWidth').value = '4.375'; document.querySelector('#borderWidth').dispatchEvent(new Event('change', {bubbles:true}))`);
   for (let i = 0; i < 3; i++) { await click('[data-unit="in"]'); await click('[data-unit="mm"]'); }
   assert.equal(await evaluate('document.querySelector("#minSlitLength").value'), '60.125');
+  assert.equal(await evaluate('document.querySelector("#borderWidth").value'), '4.375');
   await screenshot('desktop-minimum-length.png');
 
   await click('#export-stl');
@@ -189,7 +211,7 @@ try {
     readFile(path.join(root, 'src', `${name}.js`), 'utf8')));
   const engineContext = vm.createContext({ TextEncoder });
   const expectedBuffer = vm.runInContext(engineSources.join('\n') +
-    '\nMeshBuilder.binarySTL(MeshBuilder.build(PatternGenerator.generate({...PatternGenerator.DEFAULTS, minSlitLength:60.125})))', engineContext);
+    '\nMeshBuilder.binarySTL(MeshBuilder.build(PatternGenerator.generate({...PatternGenerator.DEFAULTS, minSlitLength:60.125, borderWidth:4.375})))', engineContext);
   assert.deepEqual(stl, Buffer.from(expectedBuffer), 'Browser and Node must produce identical STL bytes');
 
   await click('#save-settings');
@@ -199,28 +221,44 @@ try {
   assert.equal(saved.format, 'light-pattern-generator');
   assert.equal(saved.settings.length, 200);
   assert.equal(saved.settings.minSlitLength, 60.125);
+  assert.equal(saved.settings.borderWidth, 4.375);
 
   await evaluate(`document.querySelector('#length').value = '222'; document.querySelector('#length').dispatchEvent(new Event('change', {bubbles:true}))`);
   await evaluate(`document.querySelector('#minSlitLength').value = '10'; document.querySelector('#minSlitLength').dispatchEvent(new Event('change', {bubbles:true}))`);
+  await evaluate(`document.querySelector('#borderWidth').value = '12.7'; document.querySelector('#borderWidth').dispatchEvent(new Event('change', {bubbles:true}))`);
   const { root: dom } = await command('DOM.getDocument');
   const { nodeId } = await command('DOM.querySelector', { nodeId: dom.nodeId, selector: '#settings-file' });
   await command('DOM.setFileInputFiles', { nodeId, files: [path.join(downloads, settingsName)] });
   await waitFor(() => evaluate('document.querySelector("#length").value === "200"'), 'settings import');
+  assert.equal(await evaluate('document.querySelector("#minSlitLength").value'), '60.125');
+  assert.equal(await evaluate('document.querySelector("#borderWidth").value'), '4.375');
+
+  // Settings from the minimum-length app keep their old fixed border and their
+  // explicitly saved minimum length when loaded into this version.
+  const beforeBorderSettings = path.join(downloads, 'before-border-settings.json');
+  const beforeBorder = { ...saved, settings: { ...saved.settings } };
+  delete beforeBorder.settings.borderWidth;
+  await writeFile(beforeBorderSettings, JSON.stringify(beforeBorder));
+  await command('DOM.setFileInputFiles', { nodeId, files: [beforeBorderSettings] });
+  await waitFor(() => evaluate('document.querySelector("#borderWidth").value === "12.7"'), 'settings from before configurable borders');
   assert.equal(await evaluate('document.querySelector("#minSlitLength").value'), '60.125');
 
   // Earlier downloaded settings recreate the original geometry with no minimum.
   const legacySettings = path.join(downloads, 'legacy-settings.json');
   const legacy = { ...saved, settings: { ...saved.settings, style: 'lightning' } };
   delete legacy.settings.minSlitLength;
+  delete legacy.settings.borderWidth;
   await writeFile(legacySettings, JSON.stringify(legacy));
   await command('DOM.setFileInputFiles', { nodeId, files: [legacySettings] });
   await waitFor(() => evaluate('document.querySelector("#minSlitLength").value === "0"'), 'legacy settings import');
+  assert.equal(await evaluate('document.querySelector("#borderWidth").value'), '12.7');
   assert.equal(await evaluate('document.querySelector("#paths-stat").textContent'), '18');
 
   // Existing browser sessions without the field adopt the improved default.
   await evaluate(`localStorage.setItem('light-pattern-settings-v1', ${JSON.stringify(JSON.stringify(legacy.settings))})`);
   await command('Page.reload');
   await waitFor(() => evaluate('document.querySelector("#minSlitLength")?.value === "30" && document.querySelector("#export-stl")?.disabled === false'), 'legacy browser-session migration');
+  assert.equal(await evaluate('document.querySelector("#borderWidth").value'), '6');
   await click('#reset');
 
   await command('Emulation.setDeviceMetricsOverride', {

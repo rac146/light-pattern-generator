@@ -195,6 +195,8 @@ footer > span:first-child { letter-spacing: 1.6px; }
               <label for="width">Width <span class="input-wrap"><input id="width" name="width" type="number" value="160" step="0.1" required><span class="unit-label">mm</span></span></label>
             </div>
             <label for="thickness">Thickness <span class="input-wrap"><input id="thickness" name="thickness" type="number" value="3" step="0.1" required><span class="unit-label">mm</span></span></label>
+            <label for="borderWidth">Border width <span class="input-wrap"><input id="borderWidth" name="borderWidth" type="number" value="6" step="0.1" aria-describedby="border-hint" required><span class="unit-label">mm</span></span></label>
+            <p id="border-hint" class="hint">Solid material around all four edges. Smaller borders bring the slits closer to the edge.</p>
           </fieldset>
 
           <fieldset>
@@ -405,13 +407,13 @@ const PanelGeometry = (() => {
  */
 const PatternGenerator = (() => {
   const G = PanelGeometry;
-  const FRAME_MM = 12.7; // Automatic half-inch frame; never a required setting.
+  const LEGACY_BORDER_MM = 12.7; // Only for importing designs saved before borders were configurable.
   const LIMITS = {
-    length: [40, 500], width: [40, 500], thickness: [0.6, 20],
+    length: [40, 500], width: [40, 500], thickness: [0.6, 20], borderWidth: [1, 200],
     slitWidth: [0.6, 8], minSlitLength: [0, 1000], density: [0, 100], complexity: [1, 8]
   };
   const DEFAULTS = {
-    length: 200, width: 160, thickness: 3, slitWidth: 1.6, minSlitLength: 30,
+    length: 200, width: 160, thickness: 3, borderWidth: 6, slitWidth: 1.6, minSlitLength: 30,
     density: 50, complexity: 5, style: 'circuit', seed: 'neon-01',
     units: 'mm', color: 'cyan'
   };
@@ -425,10 +427,14 @@ const PatternGenerator = (() => {
     for (const [name, [min, max]] of Object.entries(LIMITS)) {
       if (typeof settings[name] !== 'number' || !Number.isFinite(settings[name]) ||
           settings[name] < min || settings[name] > max) {
-        const label = name === 'minSlitLength' ? 'Minimum slit length' : name;
+        const label = name === 'minSlitLength' ? 'Minimum slit length' :
+          name === 'borderWidth' ? 'Border width' : name;
         throw new Error(`${label} must be between ${min} and ${max}${
           ['density', 'complexity'].includes(name) ? '' : ' mm'}.`);
       }
+    }
+    if (settings.borderWidth * 2 >= Math.min(settings.length, settings.width)) {
+      throw new Error('Border width must be less than half the panel’s shorter dimension.');
     }
     if (!Number.isInteger(settings.complexity)) throw new Error('Bends must be a whole number.');
     if (!['circuit', 'lightning', 'mixed'].includes(settings.style)) {
@@ -508,22 +514,26 @@ const PatternGenerator = (() => {
     const minimumWeb = Math.max(2.4, settings.slitWidth);
     const miterRadius = settings.slitWidth / Math.sqrt(2);
     const clearance = 2 * miterRadius + minimumWeb + 0.05;
-    const margin = FRAME_MM + miterRadius + 0.01;
-    const availableX = settings.length - 2 * margin;
-    const availableY = settings.width - 2 * margin;
+    const border = settings.borderWidth;
+    // Leave room for the full slit outline, including its mitered corners.
+    // Border width measures solid material from the edge to the cutout itself.
+    const margin = border + miterRadius + 0.01;
+    const availableX = Math.max(0, settings.length - 2 * margin);
+    const availableY = Math.max(0, settings.width - 2 * margin);
+    const hasPatternSpace = availableX > 0 && availableY > 0;
     const gridStep = Math.max(clearance * 1.35, Math.min(availableX, availableY) / 12);
     const columns = Math.floor(availableX / gridStep);
     const rows = Math.floor(availableY / gridStep);
     const originX = (settings.length - columns * gridStep) / 2;
     const originY = (settings.width - rows * gridStep) / 2;
-    const usableArea = (settings.length - 2 * FRAME_MM) * (settings.width - 2 * FRAME_MM);
+    const usableArea = (settings.length - 2 * border) * (settings.width - 2 * border);
     const targetArea = usableArea * (0.025 + settings.density * 0.0011);
     const paths = [];
     const holes = [];
     const occupiedSegments = [];
     let openArea = 0;
 
-    for (let attempt = 0; attempt < 700 && openArea < targetArea && holes.length < 90; attempt++) {
+    for (let attempt = 0; hasPatternSpace && attempt < 700 && openArea < targetArea && holes.length < 90; attempt++) {
       const style = settings.style === 'mixed' ? pick(['circuit', 'lightning']) : settings.style;
       let direction = pick(style === 'circuit' ? [0, 2, 4, 6] : [1, 3, 5, 7]);
       let column = integer(0, columns);
@@ -561,8 +571,8 @@ const PatternGenerator = (() => {
       if (pathLength(path) < settings.minSlitLength) continue;
       const hole = offsetPath(path, settings.slitWidth);
       if (!G.isSimplePolygon(hole)) continue;
-      if (hole.some(p => p.x < FRAME_MM || p.x > settings.length - FRAME_MM ||
-                         p.y < FRAME_MM || p.y > settings.width - FRAME_MM)) continue;
+      if (hole.some(p => p.x < border || p.x > settings.length - border ||
+                         p.y < border || p.y > settings.width - border)) continue;
       if (!holes.every(other => G.polygonsHaveClearance(hole, other, minimumWeb))) continue;
 
       paths.push(path);
@@ -579,7 +589,7 @@ const PatternGenerator = (() => {
     };
   }
 
-  return { DEFAULTS, LIMITS, FRAME_MM, validate, seededRandom, pathLength, offsetPath, generate };
+  return { DEFAULTS, LIMITS, LEGACY_BORDER_MM, validate, seededRandom, pathLength, offsetPath, generate };
 })();
 
 
@@ -973,7 +983,7 @@ const PanelPreview = (() => {
 (() => {
   const P = PatternGenerator;
   const $ = id => document.getElementById(id);
-  const dimensionNames = ['length', 'width', 'thickness', 'slitWidth', 'minSlitLength'];
+  const dimensionNames = ['length', 'width', 'thickness', 'borderWidth', 'slitWidth', 'minSlitLength'];
   const form = $('settings-form');
   const preview = new PanelPreview.Preview($('preview'));
   let settings = { ...P.DEFAULTS };
@@ -1044,7 +1054,8 @@ const PanelPreview = (() => {
   function markInvalidInputs(next) {
     for (const name of dimensionNames) {
       const [min, max] = P.LIMITS[name];
-      $(name).setAttribute('aria-invalid', String(!Number.isFinite(next[name]) || next[name] < min || next[name] > max));
+      const consumesPanel = name === 'borderWidth' && next.borderWidth * 2 >= Math.min(next.length, next.width);
+      $(name).setAttribute('aria-invalid', String(!Number.isFinite(next[name]) || next[name] < min || next[name] > max || consumesPanel));
     }
     $('seed').setAttribute('aria-invalid', String(!next.seed.trim()));
   }
@@ -1079,7 +1090,7 @@ const PanelPreview = (() => {
       updateStats();
       rememberSettings();
       if (pattern.holes.length === 0) {
-        showStatus('No slits fit these settings. Enlarge the panel, reduce the slit width or minimum length, or allow more bends.');
+        showStatus('No slits fit these settings. Enlarge the panel, reduce the border, slit width or minimum length, or allow more bends.');
       } else if (pattern.densityLimited) {
         showStatus('Spacing and minimum length limit the density for this size. Try narrower slits, a lower minimum length, or a larger panel for more lines.');
       } else {
@@ -1159,9 +1170,12 @@ const PanelPreview = (() => {
     // Pick known properties instead of copying arbitrary imported keys.
     const next = Object.fromEntries(Object.keys(P.DEFAULTS).map(key =>
       [key, candidate[key] === undefined ? P.DEFAULTS[key] : candidate[key]]));
-    // Old downloaded designs had no minimum. Keep their exact seeded geometry
-    // when imported; old browser sessions adopt the new default instead.
-    if (preserveLegacyPattern && candidate.minSlitLength === undefined) next.minSlitLength = 0;
+    // Keep downloaded designs' original geometry when importing older files.
+    // Browser sessions without the new fields adopt the improved defaults.
+    if (preserveLegacyPattern) {
+      if (candidate.minSlitLength === undefined) next.minSlitLength = 0;
+      if (candidate.borderWidth === undefined) next.borderWidth = P.LEGACY_BORDER_MM;
+    }
     P.validate(next);
     if (!Object.hasOwn(PanelPreview.COLORS, next.color)) throw new Error('Choose a supported light color.');
     return next;

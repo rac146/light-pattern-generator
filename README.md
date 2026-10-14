@@ -8,8 +8,8 @@ network requests, installation, or server.
 
 1. Open **index.html** in a current Chrome, Edge, Firefox, or Safari browser.
    Windows, macOS, and Linux are supported where the browser is available.
-2. Set the panel length, width, thickness, and slit width. Switch between mm
-   and inches whenever you like; exported STL coordinates are always **mm**.
+2. Set the panel length, width, thickness, border width, and slit width. Switch
+   between mm and inches whenever you like; exported STL coordinates are always **mm**.
 3. Choose Circuit, Lightning, or Mixed. Set the minimum slit length, adjust
    density and bends, or shuffle until you find a pattern you like.
 4. Check Backlit, Cutouts, or the rotatable 3D model preview.
@@ -29,13 +29,21 @@ Settings saved by the earlier app still load: files without this field use 0
 to reproduce their original design. Existing browser sessions without the field
 adopt the new 30 mm default when the updated app opens.
 
+Border width defaults to **6 mm** (about 0.24 inches), down from the original
+12.7 mm (½ inch). It sets the minimum solid material between each cutout and
+all four outside edges, including slit corners. Old settings files without a
+border field keep their original 12.7 mm border; browser sessions without the
+field adopt the new 6 mm default. Set 12.7 mm manually for the original margin.
+
 The backlight colors only affect the preview. Use opaque filament for stronger
 contrast, and check that the model fits your printer bed. Preview brightness
 does not predict a real light source’s brightness.
 
 ## Geometry and practical limits
 
-- The panel has an automatic **12.7 mm (½-inch) solid border**.
+- The panel has a configurable solid border, defaulting to **6 mm**. Borders
+  must be 1–200 mm and less than half the panel's shorter dimension. A positive
+  frame keeps cutouts away from the exterior; thinner borders may be more flexible.
 - Cutouts have a constant width, flat ends, and sharp, mitered bends.
 - Shorter paths are discarded before becoming cutouts; the generator never
   relaxes the minimum length to fill an empty area.

@@ -103,12 +103,12 @@ test('minimum slit length applies to the whole centerline, including bends', () 
 test('zero minimum retains legacy seeded designs and short slits', () => {
   // Reference counts for the original app's default seed/settings.
   for (const [style, count] of [['circuit', 15], ['lightning', 18], ['mixed', 16]]) {
-    const legacy = P.generate(settings({ style, minSlitLength: 0 }));
+    const legacy = P.generate(settings({ style, minSlitLength: 0, borderWidth: 12.7 }));
     assert.equal(legacy.paths.length, count);
   }
-  const legacy = P.generate(settings({ style: 'lightning', minSlitLength: 0 }));
+  const legacy = P.generate(settings({ style: 'lightning', minSlitLength: 0, borderWidth: 12.7 }));
   assert.ok(legacy.paths.some(path => P.pathLength(path) < 30));
-  const filtered = P.generate(settings({ style: 'lightning', minSlitLength: 30 }));
+  const filtered = P.generate(settings({ style: 'lightning', minSlitLength: 30, borderWidth: 12.7 }));
   assert.ok(filtered.paths.every(path => P.pathLength(path) >= 30));
   assert.notDeepEqual(filtered.holes, legacy.holes);
 });
@@ -136,14 +136,48 @@ test('cutouts are simple, framed, and maintain the minimum material gap', () => 
         assert.ok(G.isSimplePolygon(hole));
         assert.ok(G.signedArea(hole) < 0, 'Hole winding must be clockwise');
         hole.forEach(p => {
-          assert.ok(p.x >= P.FRAME_MM && p.x <= pattern.settings.length - P.FRAME_MM);
-          assert.ok(p.y >= P.FRAME_MM && p.y <= pattern.settings.width - P.FRAME_MM);
+          assert.ok(p.x >= pattern.settings.borderWidth && p.x <= pattern.settings.length - pattern.settings.borderWidth);
+          assert.ok(p.y >= pattern.settings.borderWidth && p.y <= pattern.settings.width - pattern.settings.borderWidth);
         });
         pattern.holes.slice(i + 1).forEach(other => {
           assert.ok(G.polygonsHaveClearance(hole, other, pattern.minimumWeb));
         });
       });
     }
+  }
+});
+
+test('configurable borders contain the complete cutouts and keep the mesh connected', () => {
+  for (const style of ['circuit', 'lightning', 'mixed']) {
+    for (const borderWidth of [1, 6, 12.7, 30]) {
+      const pattern = P.generate(settings({ style, borderWidth, density: 100, seed: 'border-check' }));
+      assert.ok(pattern.holes.length > 0);
+      for (const hole of pattern.holes) {
+        for (const p of hole) {
+          assert.ok(p.x >= borderWidth && p.x <= pattern.settings.length - borderWidth);
+          assert.ok(p.y >= borderWidth && p.y <= pattern.settings.width - borderWidth);
+        }
+      }
+      inspectMesh(pattern);
+    }
+  }
+  const closer = P.generate(settings({ borderWidth: 1 }));
+  assert.ok(closer.holes.some(hole => hole.some(p =>
+    Math.min(p.x, p.y, closer.settings.length - p.x, closer.settings.width - p.y) < 12.7)),
+  'Reducing the border should allow cutouts inside the old half-inch margin');
+  assert.notDeepEqual(closer.holes, P.generate(settings({ borderWidth: 12.7 })).holes);
+});
+
+test('large borders handle small interiors and reject borders that consume the panel', () => {
+  const tight = P.generate(settings({ length: 40, width: 40, borderWidth: 19, slitWidth: 8 }));
+  assert.equal(tight.holes.length, 0);
+  assert.ok(tight.densityLimited);
+  assert.equal(tight.volume, 40 * 40 * 3);
+  inspectMesh(tight);
+  inspectMesh(P.generate(settings({ length: 500, width: 500, borderWidth: 200 })));
+  for (const borderWidth of [20, 21, 100]) {
+    assert.throws(() => P.generate(settings({ length: 40, width: 100, borderWidth })),
+      /less than half/);
   }
 });
 
@@ -199,6 +233,8 @@ test('invalid and untrusted settings are rejected', () => {
     { length: '200' }, { seed: '' }, { seed: 'x'.repeat(65) },
     { style: '<script>' }, { density: 101 }, { complexity: 2.5 }, { units: 'cm' },
     { minSlitLength: -1 }, { minSlitLength: 1001 }, { minSlitLength: NaN },
-    { minSlitLength: Infinity }, { minSlitLength: '30' }
+    { minSlitLength: Infinity }, { minSlitLength: '30' },
+    { borderWidth: 0 }, { borderWidth: -1 }, { borderWidth: 201 },
+    { borderWidth: NaN }, { borderWidth: Infinity }, { borderWidth: '6' }
   ]) assert.throws(() => P.generate(settings(options)));
 });

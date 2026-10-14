@@ -7,13 +7,13 @@
  */
 const PatternGenerator = (() => {
   const G = PanelGeometry;
-  const FRAME_MM = 12.7; // Automatic half-inch frame; never a required setting.
+  const LEGACY_BORDER_MM = 12.7; // Only for importing designs saved before borders were configurable.
   const LIMITS = {
-    length: [40, 500], width: [40, 500], thickness: [0.6, 20],
+    length: [40, 500], width: [40, 500], thickness: [0.6, 20], borderWidth: [1, 200],
     slitWidth: [0.6, 8], minSlitLength: [0, 1000], density: [0, 100], complexity: [1, 8]
   };
   const DEFAULTS = {
-    length: 200, width: 160, thickness: 3, slitWidth: 1.6, minSlitLength: 30,
+    length: 200, width: 160, thickness: 3, borderWidth: 6, slitWidth: 1.6, minSlitLength: 30,
     density: 50, complexity: 5, style: 'circuit', seed: 'neon-01',
     units: 'mm', color: 'cyan'
   };
@@ -27,10 +27,14 @@ const PatternGenerator = (() => {
     for (const [name, [min, max]] of Object.entries(LIMITS)) {
       if (typeof settings[name] !== 'number' || !Number.isFinite(settings[name]) ||
           settings[name] < min || settings[name] > max) {
-        const label = name === 'minSlitLength' ? 'Minimum slit length' : name;
+        const label = name === 'minSlitLength' ? 'Minimum slit length' :
+          name === 'borderWidth' ? 'Border width' : name;
         throw new Error(`${label} must be between ${min} and ${max}${
           ['density', 'complexity'].includes(name) ? '' : ' mm'}.`);
       }
+    }
+    if (settings.borderWidth * 2 >= Math.min(settings.length, settings.width)) {
+      throw new Error('Border width must be less than half the panel’s shorter dimension.');
     }
     if (!Number.isInteger(settings.complexity)) throw new Error('Bends must be a whole number.');
     if (!['circuit', 'lightning', 'mixed'].includes(settings.style)) {
@@ -110,22 +114,26 @@ const PatternGenerator = (() => {
     const minimumWeb = Math.max(2.4, settings.slitWidth);
     const miterRadius = settings.slitWidth / Math.sqrt(2);
     const clearance = 2 * miterRadius + minimumWeb + 0.05;
-    const margin = FRAME_MM + miterRadius + 0.01;
-    const availableX = settings.length - 2 * margin;
-    const availableY = settings.width - 2 * margin;
+    const border = settings.borderWidth;
+    // Leave room for the full slit outline, including its mitered corners.
+    // Border width measures solid material from the edge to the cutout itself.
+    const margin = border + miterRadius + 0.01;
+    const availableX = Math.max(0, settings.length - 2 * margin);
+    const availableY = Math.max(0, settings.width - 2 * margin);
+    const hasPatternSpace = availableX > 0 && availableY > 0;
     const gridStep = Math.max(clearance * 1.35, Math.min(availableX, availableY) / 12);
     const columns = Math.floor(availableX / gridStep);
     const rows = Math.floor(availableY / gridStep);
     const originX = (settings.length - columns * gridStep) / 2;
     const originY = (settings.width - rows * gridStep) / 2;
-    const usableArea = (settings.length - 2 * FRAME_MM) * (settings.width - 2 * FRAME_MM);
+    const usableArea = (settings.length - 2 * border) * (settings.width - 2 * border);
     const targetArea = usableArea * (0.025 + settings.density * 0.0011);
     const paths = [];
     const holes = [];
     const occupiedSegments = [];
     let openArea = 0;
 
-    for (let attempt = 0; attempt < 700 && openArea < targetArea && holes.length < 90; attempt++) {
+    for (let attempt = 0; hasPatternSpace && attempt < 700 && openArea < targetArea && holes.length < 90; attempt++) {
       const style = settings.style === 'mixed' ? pick(['circuit', 'lightning']) : settings.style;
       let direction = pick(style === 'circuit' ? [0, 2, 4, 6] : [1, 3, 5, 7]);
       let column = integer(0, columns);
@@ -163,8 +171,8 @@ const PatternGenerator = (() => {
       if (pathLength(path) < settings.minSlitLength) continue;
       const hole = offsetPath(path, settings.slitWidth);
       if (!G.isSimplePolygon(hole)) continue;
-      if (hole.some(p => p.x < FRAME_MM || p.x > settings.length - FRAME_MM ||
-                         p.y < FRAME_MM || p.y > settings.width - FRAME_MM)) continue;
+      if (hole.some(p => p.x < border || p.x > settings.length - border ||
+                         p.y < border || p.y > settings.width - border)) continue;
       if (!holes.every(other => G.polygonsHaveClearance(hole, other, minimumWeb))) continue;
 
       paths.push(path);
@@ -181,5 +189,5 @@ const PatternGenerator = (() => {
     };
   }
 
-  return { DEFAULTS, LIMITS, FRAME_MM, validate, seededRandom, pathLength, offsetPath, generate };
+  return { DEFAULTS, LIMITS, LEGACY_BORDER_MM, validate, seededRandom, pathLength, offsetPath, generate };
 })();
