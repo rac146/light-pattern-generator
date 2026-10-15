@@ -1,0 +1,61 @@
+const maze = {
+    "name": "Maze",
+    "slug": "maze",
+    "galleryOrder": 12,
+    "description": "A nod to the classic 10 PRINT one-liner: diagonal strokes tumble across the grid to form an endless maze, with the occasional junction dot.",
+    "palette": [
+        "#E9F1FF",
+        "#232529",
+        "#3E8BFF",
+        "#FF3D8B",
+        "#3FFFB2",
+        "#3EECFF"
+    ],
+    "colors": {
+        "min": 2,
+        "max": 6,
+        "default": 6
+    },
+    "options": [
+        {
+            "id": "grid",
+            "displayName": "Columns and rows",
+            "type": "ButtonSelectGroup",
+            "default": "10x15",
+            "options": [
+                "2x3",
+                "4x6",
+                "6x9",
+                "8x12",
+                "10x15"
+            ],
+            "replace": "${grid}"
+        },
+        {
+            "id": "frequency",
+            "displayName": "Frequency",
+            "type": "Slider",
+            "default": 1,
+            "min": 0.2,
+            "max": 1,
+            "step": 0.1,
+            "replace": "${shapeFrequency}"
+        },
+        {
+            "id": "thickness",
+            "displayName": "Stroke thickness",
+            "type": "Slider",
+            "default": 8,
+            "min": 4,
+            "max": 14,
+            "step": 1,
+            "replace": "${strokeWidth}"
+        }
+    ],
+    "code": {
+        "style": "/* Mostly-dark strokes with occasional accent colors */ --randomColor: @p(var(--color1), var(--color1), var(--color1), var(--color2), var(--color3), var(--color4), var(--color5)); --rule: ( /*Frequency options of 0.2, 0.4, 0.6, 0.8, 1.0 */ /* Stroke direction comes from rotating the cell rather than from the gradient angle: transforms transition on reseed, gradients can't */ @random(${shapeFrequency}) { background: linear-gradient(45deg, transparent calc(50% - ${strokeWidth}%), var(--randomColor) calc(50% - ${strokeWidth}%) calc(50% + ${strokeWidth}%), transparent calc(50% + ${strokeWidth}%)); -webkit-transform: rotate(@pick(0deg, 90deg)); transform: rotate(@pick(0deg, 90deg)); } /* Occasional junction dots break up the lines */ @random(0.08) { background: none; :after { content: ''; position: absolute; @size: calc(${strokeWidth}% * 2.6); left: 50%; top: 50%; -webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%); border-radius: 50%; background: var(--randomColor); -webkit-transition: ease 400ms; transition: ease 400ms; } } -webkit-transition: ease 400ms; transition: ease 400ms; );",
+        "doodle": ":doodle { @grid: ${grid}; @size: ${width} ${height}; overflow:hidden; text-align:center; box-sizing:border-box } :container { background: var(--color0); overflow:hidden; }"
+    }
+};
+export default maze;
+//# sourceMappingURL=maze.js.map

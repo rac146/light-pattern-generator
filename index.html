@@ -5,6 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
   <title>Light Pattern Generator</title>
+  <!--
+Tabbied 0.10.0 pattern definitions
+MIT License
+
+Copyright (c) 2026 Sy Hong and Ye Joo Park
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
   <style>:root {
   --background: #0c1114;
   --surface: #121a1e;
@@ -57,7 +81,8 @@ legend .legend-title > span { color: var(--text); margin-left: 9px; letter-spaci
 .unit-switch button, .view-switch button { border: 0; border-radius: 4px; padding: 4px 8px; color: var(--muted); background: transparent; font-size: 11px; }
 .unit-switch button[aria-pressed="true"], .view-switch button[aria-pressed="true"] { background: #293a42; color: var(--text); }
 label { display: block; color: #b4c3c9; font-size: 12px; margin-bottom: 7px; }
-input[type="number"], input[type="text"], select { width: 100%; border: 1px solid #304047; border-radius: 7px; padding: 10px 11px; color: var(--text); background: #0d1519; min-width: 0; }
+input[type="number"], input[type="text"], input[type="search"], select { width: 100%; border: 1px solid #304047; border-radius: 7px; padding: 10px 11px; color: var(--text); background: #0d1519; min-width: 0; }
+#pattern-filter { margin-bottom: 14px; }
 input[aria-invalid="true"] { border-color: #ec9581; }
 input[type="number"] { appearance: textfield; -moz-appearance: textfield; }
 input::-webkit-inner-spin-button { appearance: none; }
@@ -72,6 +97,8 @@ output { font-size: 12px; color: var(--accent); font-variant-numeric: tabular-nu
 input[type="range"] { width: 100%; margin: 5px 0; accent-color: var(--accent); cursor: pointer; }
 .range-captions { display: flex; justify-content: space-between; font-size: 10px; color: #718992; margin-bottom: 15px; }
 .hint { font-size: 10px; color: #8299a2; margin: 7px 0 0; }
+#style-hint { margin: -8px 0 15px; }
+#density-hint:not(:empty) { margin-bottom: 12px; }
 .automatic-note { display: flex; align-items: start; gap: 9px; padding: 13px 0 0; border-top: 1px solid var(--line); }
 .note-symbol { color: var(--accent); font-size: 19px; line-height: 1.3; }
 .automatic-note p { color: #8da5ae; font-size: 11px; line-height: 1.65; margin: 0; }
@@ -201,21 +228,27 @@ footer > span:first-child { letter-spacing: 1.6px; }
 
           <fieldset>
             <legend><span class="legend-title">02 <span>Pattern</span></span></legend>
-            <label for="style">Line style</label>
-            <select id="style" name="style">
-              <option value="circuit">Circuit · square turns</option>
-              <option value="lightning">Lightning · angled turns</option>
-              <option value="mixed">Mixed · a bit of both</option>
-            </select>
-            <label for="slitWidth">Slit width <span class="input-wrap"><input id="slitWidth" name="slitWidth" type="number" value="1.6" step="0.1" required><span class="unit-label">mm</span></span></label>
-            <label for="minSlitLength">Minimum slit length <span class="input-wrap"><input id="minSlitLength" name="minSlitLength" type="number" value="30" step="0.1" aria-describedby="min-slit-hint" required><span class="unit-label">mm</span></span></label>
-            <p id="min-slit-hint" class="hint">Total length along each slit’s bends. Set 0 for no minimum.</p>
+            <label for="pattern-filter">Find a pattern</label>
+            <input id="pattern-filter" type="search" placeholder="Search names or shapes…" autocomplete="off" aria-controls="style">
+            <label for="style">Pattern style</label>
+            <select id="style" name="style" aria-describedby="style-hint"></select>
+            <p id="style-hint" class="hint"></p>
+            <div id="line-controls">
+              <label for="slitWidth">Slit width <span class="input-wrap"><input id="slitWidth" name="slitWidth" type="number" value="1.6" step="0.1" required><span class="unit-label">mm</span></span></label>
+              <label for="minSlitLength">Minimum slit length <span class="input-wrap"><input id="minSlitLength" name="minSlitLength" type="number" value="30" step="0.1" aria-describedby="min-slit-hint" required><span class="unit-label">mm</span></span></label>
+              <p id="min-slit-hint" class="hint">Total length along each slit’s bends. Set 0 for no minimum.</p>
+              <div class="range-heading"><label for="complexity">Bends</label><output id="complexity-value" for="complexity">5</output></div>
+              <input id="complexity" name="complexity" type="range" min="1" max="8" value="5">
+              <div class="range-captions"><span>Simple</span><span>Winding</span></div>
+            </div>
+            <div id="tile-controls" hidden>
+              <label for="patternSize">Pattern size <span class="input-wrap"><input id="patternSize" name="patternSize" type="number" value="30" step="0.1" aria-describedby="pattern-size-hint" required><span class="unit-label">mm</span></span></label>
+              <p id="pattern-size-hint" class="hint">Size of each tile. Smaller tiles create a finer pattern.</p>
+            </div>
             <div class="range-heading"><label for="density">Density</label><output id="density-value" for="density">50%</output></div>
             <input id="density" name="density" type="range" min="0" max="100" value="50">
             <div class="range-captions"><span>Scattered</span><span>Busy</span></div>
-            <div class="range-heading"><label for="complexity">Bends</label><output id="complexity-value" for="complexity">5</output></div>
-            <input id="complexity" name="complexity" type="range" min="1" max="8" value="5">
-            <div class="range-captions"><span>Simple</span><span>Winding</span></div>
+            <p id="density-hint" class="hint"></p>
             <label for="seed">Pattern seed</label>
             <input id="seed" name="seed" type="text" value="neon-01" maxlength="64" spellcheck="false" autocomplete="off" required>
             <p class="hint">Same seed + same settings = same pattern.</p>
@@ -224,7 +257,7 @@ footer > span:first-child { letter-spacing: 1.6px; }
 
         <div class="automatic-note">
           <span class="note-symbol" aria-hidden="true">◇</span>
-          <p><strong>Designed to stay together.</strong><br>A solid frame and spaced, open-ended cuts keep your panel in one piece.</p>
+          <p><strong>Designed to stay together.</strong><br>A solid frame and spaced cutouts keep your panel in one piece.</p>
         </div>
         <div class="settings-actions">
           <button id="save-settings" class="button button-subtle" type="button">Save settings</button>
@@ -257,7 +290,7 @@ footer > span:first-child { letter-spacing: 1.6px; }
         <div class="stats" aria-label="Generated panel information">
           <div><span class="stat-label">PANEL SIZE</span><strong id="size-stat">200 × 160 × 3 mm</strong></div>
           <div><span class="stat-label">LIGHT OPENING</span><strong id="opening-stat">—</strong></div>
-          <div><span class="stat-label">SLIT PATHS</span><strong id="paths-stat">—</strong></div>
+          <div><span class="stat-label">CUTOUTS</span><strong id="paths-stat">—</strong></div>
         </div>
         <div id="status" class="status" role="status" aria-live="polite"></div>
         <div class="export-row">
@@ -397,56 +430,10 @@ const PanelGeometry = (() => {
 })();
 
 
-// ─── src/pattern.js ───
-/**
- * Deterministic random paths → constant-width polygonal cutouts.
- *
- * Every cutout is a simple polygon, entirely inside the frame. Cutouts never
- * touch or overlap, so the remaining plate is connected to its outer frame.
- * No rasterization is involved: diagonal edges stay straight in the STL.
- */
-const PatternGenerator = (() => {
+// ─── src/pattern-tools.js ───
+/** Shared seeded randomness and open-path outline math, all in mm. */
+const PatternTools = (() => {
   const G = PanelGeometry;
-  const LEGACY_BORDER_MM = 12.7; // Only for importing designs saved before borders were configurable.
-  const LIMITS = {
-    length: [40, 500], width: [40, 500], thickness: [0.6, 20], borderWidth: [1, 200],
-    slitWidth: [0.6, 8], minSlitLength: [0, 1000], density: [0, 100], complexity: [1, 8]
-  };
-  const DEFAULTS = {
-    length: 200, width: 160, thickness: 3, borderWidth: 6, slitWidth: 1.6, minSlitLength: 30,
-    density: 50, complexity: 5, style: 'circuit', seed: 'neon-01',
-    units: 'mm', color: 'cyan'
-  };
-  // Counterclockwise compass directions. Even indexes are orthogonal.
-  const DIRECTIONS = [
-    [1, 0], [1, 1], [0, 1], [-1, 1],
-    [-1, 0], [-1, -1], [0, -1], [1, -1]
-  ];
-
-  function validate(settings) {
-    for (const [name, [min, max]] of Object.entries(LIMITS)) {
-      if (typeof settings[name] !== 'number' || !Number.isFinite(settings[name]) ||
-          settings[name] < min || settings[name] > max) {
-        const label = name === 'minSlitLength' ? 'Minimum slit length' :
-          name === 'borderWidth' ? 'Border width' : name;
-        throw new Error(`${label} must be between ${min} and ${max}${
-          ['density', 'complexity'].includes(name) ? '' : ' mm'}.`);
-      }
-    }
-    if (settings.borderWidth * 2 >= Math.min(settings.length, settings.width)) {
-      throw new Error('Border width must be less than half the panel’s shorter dimension.');
-    }
-    if (!Number.isInteger(settings.complexity)) throw new Error('Bends must be a whole number.');
-    if (!['circuit', 'lightning', 'mixed'].includes(settings.style)) {
-      throw new Error('Choose a supported pattern style.');
-    }
-    if (typeof settings.seed !== 'string' || !settings.seed.trim() || settings.seed.length > 64) {
-      throw new Error('Enter a seed containing 1–64 characters.');
-    }
-    if (settings.units !== 'mm' && settings.units !== 'in') throw new Error('Choose mm or inches.');
-    return settings;
-  }
-
   // FNV-1a hashes any seed string; Mulberry32 supplies portable 32-bit randomness.
   // Do not use Math.random() here: a saved seed must recreate the same geometry.
   function seededRandom(seed) {
@@ -496,6 +483,23 @@ const PatternGenerator = (() => {
     return G.signedArea(polygon) < 0 ? polygon : polygon.reverse();
   }
 
+
+  return { seededRandom, pathSegments, pathLength, offsetPath };
+})();
+
+
+// ─── src/patterns/simple.js ───
+/** Original Circuit, Lightning and Mixed algorithms. Keep random call order
+ * stable: existing saved seeds must continue to reproduce their designs. */
+const SimplePatterns = (() => {
+  const G = PanelGeometry;
+  const { seededRandom, pathSegments, pathLength, offsetPath } = PatternTools;
+  // Counterclockwise compass directions. Even indexes are orthogonal.
+  const DIRECTIONS = [
+    [1, 0], [1, 1], [0, 1], [-1, 1],
+    [-1, 0], [-1, -1], [0, -1], [1, -1]
+  ];
+
   function canAddSegment(path, end, occupiedSegments, clearance) {
     const start = path[path.length - 1];
     const candidateBounds = G.bounds([start, end]);
@@ -506,12 +510,11 @@ const PatternGenerator = (() => {
       G.segmentDistanceSquared(start, end, a, b) >= clearance * clearance);
   }
 
-  function generate(settings) {
-    validate(settings);
+  function generate(settings, cuts) {
     const random = seededRandom(settings.seed);
     const integer = (min, max) => min + Math.floor(random() * (max - min + 1));
     const pick = values => values[integer(0, values.length - 1)];
-    const minimumWeb = Math.max(2.4, settings.slitWidth);
+    const minimumWeb = cuts.minimumWeb;
     const miterRadius = settings.slitWidth / Math.sqrt(2);
     const clearance = 2 * miterRadius + minimumWeb + 0.05;
     const border = settings.borderWidth;
@@ -528,8 +531,7 @@ const PatternGenerator = (() => {
     const originY = (settings.width - rows * gridStep) / 2;
     const usableArea = (settings.length - 2 * border) * (settings.width - 2 * border);
     const targetArea = usableArea * (0.025 + settings.density * 0.0011);
-    const paths = [];
-    const holes = [];
+    const holes = cuts.holes;
     const occupiedSegments = [];
     let openArea = 0;
 
@@ -570,26 +572,2932 @@ const PatternGenerator = (() => {
       // Never shorten this threshold just to fill the requested density.
       if (pathLength(path) < settings.minSlitLength) continue;
       const hole = offsetPath(path, settings.slitWidth);
-      if (!G.isSimplePolygon(hole)) continue;
-      if (hole.some(p => p.x < border || p.x > settings.length - border ||
-                         p.y < border || p.y > settings.width - border)) continue;
-      if (!holes.every(other => G.polygonsHaveClearance(hole, other, minimumWeb))) continue;
+      if (!cuts.add(hole, path)) continue;
 
-      paths.push(path);
-      holes.push(hole);
       occupiedSegments.push(...pathSegments(path));
       openArea += Math.abs(G.signedArea(hole));
     }
 
+    return { densityLimited: openArea < targetArea * 0.85 };
+  }
+
+  return {
+    id: 'simple', label: 'Original lines', controls: 'lines',
+    designs: [
+      { id: 'circuit', label: 'Circuit · square turns' },
+      { id: 'lightning', label: 'Lightning · angled turns' },
+      { id: 'mixed', label: 'Mixed · a bit of both' }
+    ],
+    generate
+  };
+})();
+
+
+// ─── src/patterns/tabbied-presets.js ───
+// Generated from pinned MIT Tabbied definitions; edit scripts/tabbied-*.mjs, not this file.
+const TabbiedPresets = {
+  "version": "0.10.0",
+  "designs": [
+    {
+      "id": "tabbied:hilbert",
+      "slug": "hilbert",
+      "label": "Hilbert",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "U-shaped cutouts turn through four orientations in a tiled field.",
+      "polygon": [
+        [
+          0.14,
+          0.14
+        ],
+        [
+          0.34,
+          0.14
+        ],
+        [
+          0.34,
+          0.66
+        ],
+        [
+          0.66,
+          0.66
+        ],
+        [
+          0.66,
+          0.14
+        ],
+        [
+          0.86,
+          0.14
+        ],
+        [
+          0.86,
+          0.86
+        ],
+        [
+          0.14,
+          0.86
+        ]
+      ],
+      "orientation": "cycle",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:switchback",
+      "slug": "switchback",
+      "label": "Switchback",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Bold L-shaped cutouts turn in random directions, with solid gaps between tiles.",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          0.35,
+          0
+        ],
+        [
+          0.35,
+          0.65
+        ],
+        [
+          1,
+          0.65
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:spark",
+      "slug": "spark",
+      "label": "Spark",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Pointed spark cutouts repeat across the panel.",
+      "polygon": [
+        [
+          0.5,
+          0
+        ],
+        [
+          0.61,
+          0.39
+        ],
+        [
+          1,
+          0.5
+        ],
+        [
+          0.61,
+          0.61
+        ],
+        [
+          0.5,
+          1
+        ],
+        [
+          0.39,
+          0.61
+        ],
+        [
+          0,
+          0.5
+        ],
+        [
+          0.39,
+          0.39
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1
+      ]
+    },
+    {
+      "id": "tabbied:annulus",
+      "slug": "annulus",
+      "label": "Annulus",
+      "orientation": "fixed",
+      "turns": [
+        0
+      ],
+      "kind": "annulus",
+      "category": "Curves",
+      "minCell": 14,
+      "description": "Rings thicken down the panel. Two solid bridges hold each center in place."
+    },
+    {
+      "id": "tabbied:apse",
+      "slug": "apse",
+      "label": "Apse",
+      "orientation": "random",
+      "turns": [
+        0,
+        1
+      ],
+      "kind": "apse",
+      "category": "Curves",
+      "description": "Rectangular bodies end in a semicircular extension."
+    },
+    {
+      "id": "tabbied:bangle",
+      "slug": "bangle",
+      "label": "Bangle",
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "kind": "arc",
+      "category": "Curves",
+      "outer": 0.8202438661763951,
+      "inner": 0.6222539674441618,
+      "description": "Quarter-ring arcs turn around tile corners, separated by material bridges."
+    },
+    {
+      "id": "tabbied:bauhaus",
+      "slug": "bauhaus",
+      "label": "Bauhaus",
+      "orientation": "fixed",
+      "turns": [
+        0
+      ],
+      "kind": "rounded",
+      "category": "Curves",
+      "corners": [
+        [
+          0.5,
+          0.5,
+          0.5,
+          0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0.5,
+          0.5
+        ],
+        [
+          0.5,
+          0,
+          0,
+          0.5
+        ],
+        [
+          0,
+          0.5,
+          0.5,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0.5,
+          0,
+          0.5,
+          0
+        ],
+        [
+          0,
+          0.5,
+          0,
+          0.5
+        ]
+      ],
+      "description": "Circles, rounded blocks and leaf-like shapes mix in a geometric field."
+    },
+    {
+      "id": "tabbied:bight",
+      "slug": "bight",
+      "label": "Bight",
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "kind": "bight",
+      "category": "Curves",
+      "description": "Broad blocks have a curved bay removed from one edge."
+    },
+    {
+      "id": "tabbied:bluff",
+      "slug": "bluff",
+      "label": "Bluff",
+      "orientation": "random",
+      "turns": [
+        0,
+        1
+      ],
+      "kind": "bluff",
+      "category": "Curves",
+      "description": "Rounded bulges project from the edge of each tile."
+    },
+    {
+      "id": "tabbied:bowl",
+      "slug": "bowl",
+      "label": "Bowl",
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "kind": "rounded",
+      "category": "Curves",
+      "box": [
+        0.06,
+        0.06,
+        0.88,
+        0.88
+      ],
+      "corners": [
+        [
+          0,
+          0,
+          0.5,
+          0.5
+        ]
+      ],
+      "description": "Bowl-shaped cutouts with rounded lower corners turn across the panel."
+    },
+    {
+      "id": "tabbied:cavetto",
+      "slug": "cavetto",
+      "label": "Cavetto",
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "kind": "rounded",
+      "category": "Curves",
+      "corners": [
+        [
+          0,
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          0.5,
+          0.5
+        ]
+      ],
+      "weights": [
+        0.7,
+        0.3
+      ],
+      "description": "Single curved corners mix with bowls, rotated within separate tiles."
+    },
+    {
+      "id": "tabbied:protractor",
+      "slug": "protractor",
+      "label": "Protractor",
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "kind": "protractor",
+      "category": "Curves",
+      "description": "Half-ring cutouts leave a solid opening to their center."
+    },
+    {
+      "id": "tabbied:radius",
+      "slug": "radius",
+      "label": "Radius",
+      "orientation": "fixed",
+      "turns": [
+        0
+      ],
+      "kind": "radius",
+      "category": "Curves",
+      "description": "Quarter discs and circles fill separate tiles with solid gaps."
+    },
+    {
+      "id": "tabbied:alcove",
+      "slug": "alcove",
+      "label": "Alcove",
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "kind": "alcove",
+      "category": "Multi-part",
+      "description": "Three bands join into a U-shaped opening in each tile."
+    },
+    {
+      "id": "tabbied:casing",
+      "slug": "casing",
+      "label": "Casing",
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "kind": "casing",
+      "category": "Multi-part",
+      "description": "Square frames have two deliberate breaks to keep their centers attached."
+    },
+    {
+      "id": "tabbied:strand",
+      "slug": "strand",
+      "label": "Strand",
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "kind": "rectangles",
+      "category": "Multi-part",
+      "minCell": 20,
+      "boxes": [
+        [
+          0,
+          0,
+          1,
+          0.3
+        ],
+        [
+          0,
+          0.46,
+          1,
+          0.12
+        ]
+      ],
+      "description": "A broad band and a narrow band share each tile."
+    },
+    {
+      "id": "tabbied:twohalf",
+      "slug": "twohalf",
+      "label": "Twohalf",
+      "orientation": "random",
+      "turns": [
+        0,
+        1
+      ],
+      "kind": "rectangles",
+      "category": "Multi-part",
+      "minCell": 24,
+      "boxes": [
+        [
+          0,
+          0,
+          0.44,
+          1
+        ],
+        [
+          0.56,
+          0,
+          0.44,
+          1
+        ]
+      ],
+      "description": "Two broad blocks share each tile, separated by a solid channel."
+    },
+    {
+      "id": "tabbied:weave",
+      "slug": "weave",
+      "label": "Weave",
+      "orientation": "random",
+      "turns": [
+        0,
+        1
+      ],
+      "kind": "weave",
+      "category": "Multi-part",
+      "minCell": 23,
+      "description": "Alternating stripe tiles mix with occasional round or square patches."
+    },
+    {
+      "id": "tabbied:anabranch",
+      "slug": "anabranch",
+      "label": "Anabranch",
+      "orientation": "random",
+      "turns": [
+        0,
+        1
+      ],
+      "kind": "paired-arcs",
+      "category": "Paths",
+      "outer": 0.6,
+      "inner": 0.4,
+      "minCell": 14,
+      "description": "Broad paired arcs form winding channels with solid gaps between tiles."
+    },
+    {
+      "id": "tabbied:circuit",
+      "slug": "circuit",
+      "label": "Circuit",
+      "orientation": "fixed",
+      "turns": [
+        0
+      ],
+      "kind": "circuit",
+      "category": "Paths",
+      "minCell": 18,
+      "description": "Random horizontal and vertical traces meet at corners, with occasional component nodes and solid gaps."
+    },
+    {
+      "id": "tabbied:curl",
+      "slug": "curl",
+      "label": "Curl",
+      "orientation": "random",
+      "turns": [
+        0,
+        1
+      ],
+      "kind": "paired-arcs",
+      "category": "Paths",
+      "outer": 0.58,
+      "inner": 0.42,
+      "minCell": 14,
+      "description": "Paired quarter arcs suggest winding paths. Solid gaps keep loops from detaching material."
+    },
+    {
+      "id": "tabbied:maze",
+      "slug": "maze",
+      "label": "Maze",
+      "orientation": "random",
+      "turns": [
+        0,
+        1
+      ],
+      "kind": "maze",
+      "category": "Paths",
+      "description": "Diagonal maze strokes and occasional round nodes have solid gaps between tiles."
+    },
+    {
+      "id": "tabbied:truchetrings",
+      "slug": "truchetrings",
+      "label": "Truchet Rings",
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "kind": "paired-arcs",
+      "category": "Paths",
+      "outer": 0.54,
+      "inner": 0.46,
+      "minCell": 14,
+      "description": "Thin paired arcs turn across the grid, with solid bridges between tiles."
+    },
+    {
+      "id": "tabbied:abutment",
+      "slug": "abutment",
+      "label": "Abutment",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Abutment shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          0.46,
+          0
+        ],
+        [
+          0.68,
+          0.44
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:angleoff",
+      "slug": "angleoff",
+      "label": "Angleoff",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Angleoff shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0.16
+        ],
+        [
+          0,
+          0.92
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:arris",
+      "slug": "arris",
+      "label": "Arris",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Arris shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0.26,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          0.26
+        ]
+      ],
+      "orientation": "fixed",
+      "turns": [
+        0
+      ]
+    },
+    {
+      "id": "tabbied:battlement",
+      "slug": "battlement",
+      "label": "Battlement",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Battlement shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0.35
+        ],
+        [
+          0.2,
+          0.35
+        ],
+        [
+          0.2,
+          0
+        ],
+        [
+          0.4,
+          0
+        ],
+        [
+          0.4,
+          0.35
+        ],
+        [
+          0.6,
+          0.35
+        ],
+        [
+          0.6,
+          0
+        ],
+        [
+          0.8,
+          0
+        ],
+        [
+          0.8,
+          0.35
+        ],
+        [
+          1,
+          0.35
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:bench",
+      "slug": "bench",
+      "label": "Bench",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Bench shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          0.58
+        ],
+        [
+          0.46,
+          0.58
+        ],
+        [
+          0.46,
+          0.26
+        ],
+        [
+          1,
+          0.26
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:bevelset",
+      "slug": "bevelset",
+      "label": "Bevelset",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Bevelset shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0.3,
+          0
+        ],
+        [
+          0.7,
+          0
+        ],
+        [
+          1,
+          0.3
+        ],
+        [
+          1,
+          0.7
+        ],
+        [
+          0.7,
+          1
+        ],
+        [
+          0.3,
+          1
+        ],
+        [
+          0,
+          0.7
+        ],
+        [
+          0,
+          0.3
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1
+      ]
+    },
+    {
+      "id": "tabbied:birdsmouth",
+      "slug": "birdsmouth",
+      "label": "Birdsmouth",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Birdsmouth shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0.5,
+          0.46
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:bobbin",
+      "slug": "bobbin",
+      "label": "Bobbin",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Bobbin shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0.12,
+          0.08
+        ],
+        [
+          0.88,
+          0.08
+        ],
+        [
+          0.88,
+          0.28
+        ],
+        [
+          0.6,
+          0.42
+        ],
+        [
+          0.6,
+          0.58
+        ],
+        [
+          0.88,
+          0.72
+        ],
+        [
+          0.88,
+          0.92
+        ],
+        [
+          0.12,
+          0.92
+        ],
+        [
+          0.12,
+          0.72
+        ],
+        [
+          0.4,
+          0.58
+        ],
+        [
+          0.4,
+          0.42
+        ],
+        [
+          0.12,
+          0.28
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1
+      ]
+    },
+    {
+      "id": "tabbied:bracket",
+      "slug": "bracket",
+      "label": "Bracket",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Bracket shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          0.42,
+          0
+        ],
+        [
+          0.42,
+          0.58
+        ],
+        [
+          1,
+          0.58
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:caltrop",
+      "slug": "caltrop",
+      "label": "Caltrop",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Caltrop shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0.5,
+          0.12
+        ],
+        [
+          0.62,
+          0.38
+        ],
+        [
+          0.88,
+          0.5
+        ],
+        [
+          0.62,
+          0.62
+        ],
+        [
+          0.5,
+          0.88
+        ],
+        [
+          0.38,
+          0.62
+        ],
+        [
+          0.12,
+          0.5
+        ],
+        [
+          0.38,
+          0.38
+        ]
+      ],
+      "orientation": "fixed",
+      "turns": [
+        0
+      ]
+    },
+    {
+      "id": "tabbied:cascade",
+      "slug": "cascade",
+      "label": "Cascade",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Cascade shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          0.34,
+          0
+        ],
+        [
+          0.34,
+          0.34
+        ],
+        [
+          0.67,
+          0.34
+        ],
+        [
+          0.67,
+          0.67
+        ],
+        [
+          1,
+          0.67
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:chamfer",
+      "slug": "chamfer",
+      "label": "Chamfer",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Chamfer shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          0.7,
+          0
+        ],
+        [
+          1,
+          0.3
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:clipcorner",
+      "slug": "clipcorner",
+      "label": "Clipcorner",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Clipcorner shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0.36,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0.64
+        ],
+        [
+          0.64,
+          1
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          0.36
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1
+      ]
+    },
+    {
+      "id": "tabbied:cornerchip",
+      "slug": "cornerchip",
+      "label": "Cornerchip",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Cornerchip shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0.44,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0.56
+        ],
+        [
+          0.56,
+          1
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          0.44
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1
+      ]
+    },
+    {
+      "id": "tabbied:cornercut",
+      "slug": "cornercut",
+      "label": "Cornercut",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Cornercut shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          0.62,
+          0
+        ],
+        [
+          1,
+          0.38
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:dieblock",
+      "slug": "dieblock",
+      "label": "Dieblock",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Dieblock shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0.22,
+          0
+        ],
+        [
+          0.78,
+          0
+        ],
+        [
+          0.78,
+          0.22
+        ],
+        [
+          1,
+          0.22
+        ],
+        [
+          1,
+          0.78
+        ],
+        [
+          0.78,
+          0.78
+        ],
+        [
+          0.78,
+          1
+        ],
+        [
+          0.22,
+          1
+        ],
+        [
+          0.22,
+          0.78
+        ],
+        [
+          0,
+          0.78
+        ],
+        [
+          0,
+          0.22
+        ],
+        [
+          0.22,
+          0.22
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1
+      ]
+    },
+    {
+      "id": "tabbied:dogtooth",
+      "slug": "dogtooth",
+      "label": "Dogtooth",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Dogtooth shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          0.6,
+          0
+        ],
+        [
+          0.6,
+          0.4
+        ],
+        [
+          1,
+          0.4
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0.4,
+          1
+        ],
+        [
+          0.4,
+          0.6
+        ],
+        [
+          0,
+          0.6
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:ell",
+      "slug": "ell",
+      "label": "Ell",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Ell shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          0.48,
+          0
+        ],
+        [
+          0.48,
+          0.52
+        ],
+        [
+          1,
+          0.52
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:gnomonwedge",
+      "slug": "gnomonwedge",
+      "label": "Gnomonwedge",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Gnomonwedge shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:gorge",
+      "slug": "gorge",
+      "label": "Gorge",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Gorge shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          0.42,
+          0
+        ],
+        [
+          0.46,
+          0.88
+        ],
+        [
+          0.54,
+          0.88
+        ],
+        [
+          0.58,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:guernsey",
+      "slug": "guernsey",
+      "label": "Guernsey",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Guernsey shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0.44
+        ],
+        [
+          0.25,
+          0.2
+        ],
+        [
+          0.5,
+          0.44
+        ],
+        [
+          0.75,
+          0.2
+        ],
+        [
+          1,
+          0.44
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:gully",
+      "slug": "gully",
+      "label": "Gully",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Gully shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0.58,
+          1
+        ],
+        [
+          0.5,
+          0.4
+        ],
+        [
+          0.42,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:halving",
+      "slug": "halving",
+      "label": "Halving",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Halving shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          0.36,
+          0
+        ],
+        [
+          0.36,
+          0.26
+        ],
+        [
+          0.64,
+          0.26
+        ],
+        [
+          0.64,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0.64,
+          1
+        ],
+        [
+          0.64,
+          0.74
+        ],
+        [
+          0.36,
+          0.74
+        ],
+        [
+          0.36,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1
+      ]
+    },
+    {
+      "id": "tabbied:housing",
+      "slug": "housing",
+      "label": "Housing",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Housing shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          0.66
+        ],
+        [
+          0.64,
+          0.66
+        ],
+        [
+          0.64,
+          0.34
+        ],
+        [
+          0,
+          0.34
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:jerkinhead",
+      "slug": "jerkinhead",
+      "label": "Jerkinhead",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Jerkinhead shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          0.46
+        ],
+        [
+          0.72,
+          0.14
+        ],
+        [
+          0.28,
+          0.14
+        ],
+        [
+          0,
+          0.46
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:larmier",
+      "slug": "larmier",
+      "label": "Larmier",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Larmier shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0.3
+        ],
+        [
+          1,
+          0.3
+        ],
+        [
+          1,
+          0.52
+        ],
+        [
+          0.84,
+          0.68
+        ],
+        [
+          0.16,
+          0.68
+        ],
+        [
+          0,
+          0.52
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1
+      ]
+    },
+    {
+      "id": "tabbied:lintel",
+      "slug": "lintel",
+      "label": "Lintel",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Lintel shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0.72,
+          1
+        ],
+        [
+          0.72,
+          0.28
+        ],
+        [
+          0.28,
+          0.28
+        ],
+        [
+          0.28,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "orientation": "fixed",
+      "turns": [
+        0
+      ]
+    },
+    {
+      "id": "tabbied:louvre",
+      "slug": "louvre",
+      "label": "Louvre",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Louvre shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0.22
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0.78
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "orientation": "fixed",
+      "turns": [
+        0
+      ]
+    },
+    {
+      "id": "tabbied:merlon",
+      "slug": "merlon",
+      "label": "Merlon",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Merlon shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0.66,
+          1
+        ],
+        [
+          0.66,
+          0.45
+        ],
+        [
+          0.34,
+          0.45
+        ],
+        [
+          0.34,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:mitre",
+      "slug": "mitre",
+      "label": "Mitre",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Mitre shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0.24
+        ],
+        [
+          0,
+          0.88
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:modillion",
+      "slug": "modillion",
+      "label": "Modillion",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Modillion shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0.28
+        ],
+        [
+          0.58,
+          0.28
+        ],
+        [
+          0.58,
+          0.52
+        ],
+        [
+          0.82,
+          0.52
+        ],
+        [
+          0.4,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:mutule",
+      "slug": "mutule",
+      "label": "Mutule",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Mutule shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0.7
+        ],
+        [
+          0.76,
+          0.7
+        ],
+        [
+          0.76,
+          1
+        ],
+        [
+          0.24,
+          1
+        ],
+        [
+          0.24,
+          0.7
+        ],
+        [
+          0,
+          0.7
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:northstar",
+      "slug": "northstar",
+      "label": "Northstar",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Northstar shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0.5,
+          0
+        ],
+        [
+          0.61,
+          0.39
+        ],
+        [
+          1,
+          0.5
+        ],
+        [
+          0.61,
+          0.61
+        ],
+        [
+          0.5,
+          1
+        ],
+        [
+          0.39,
+          0.61
+        ],
+        [
+          0,
+          0.5
+        ],
+        [
+          0.39,
+          0.39
+        ]
+      ],
+      "orientation": "fixed",
+      "turns": [
+        0
+      ]
+    },
+    {
+      "id": "tabbied:nosing",
+      "slug": "nosing",
+      "label": "Nosing",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Nosing shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0.62
+        ],
+        [
+          0.7,
+          0.62
+        ],
+        [
+          0.7,
+          0.8
+        ],
+        [
+          0.36,
+          0.8
+        ],
+        [
+          0.36,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:notchblock",
+      "slug": "notchblock",
+      "label": "Notchblock",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Notchblock shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0.58,
+          1
+        ],
+        [
+          0.58,
+          0.58
+        ],
+        [
+          0,
+          0.58
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:octagon",
+      "slug": "octagon",
+      "label": "Octagon",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Octagon shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0.3,
+          0.04
+        ],
+        [
+          0.7,
+          0.04
+        ],
+        [
+          0.96,
+          0.3
+        ],
+        [
+          0.96,
+          0.7
+        ],
+        [
+          0.7,
+          0.96
+        ],
+        [
+          0.3,
+          0.96
+        ],
+        [
+          0.04,
+          0.7
+        ],
+        [
+          0.04,
+          0.3
+        ]
+      ],
+      "orientation": "fixed",
+      "turns": [
+        0
+      ]
+    },
+    {
+      "id": "tabbied:quoinwedge",
+      "slug": "quoinwedge",
+      "label": "Quoinwedge",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Quoinwedge shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0.34
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:rabbet",
+      "slug": "rabbet",
+      "label": "Rabbet",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Rabbet shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0.16,
+          0.16
+        ],
+        [
+          0.52,
+          0.16
+        ],
+        [
+          0.52,
+          0.52
+        ],
+        [
+          0.84,
+          0.52
+        ],
+        [
+          0.84,
+          0.84
+        ],
+        [
+          0.16,
+          0.84
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:rafter",
+      "slug": "rafter",
+      "label": "Rafter",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Rafter shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0.58
+        ],
+        [
+          0.58,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0.42
+        ],
+        [
+          0.42,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "orientation": "fixed",
+      "turns": [
+        0
+      ]
+    },
+    {
+      "id": "tabbied:rebate",
+      "slug": "rebate",
+      "label": "Rebate",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Rebate shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0.14,
+          0.14
+        ],
+        [
+          0.86,
+          0.14
+        ],
+        [
+          0.86,
+          0.86
+        ],
+        [
+          0.62,
+          0.86
+        ],
+        [
+          0.62,
+          0.56
+        ],
+        [
+          0.14,
+          0.56
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:skewback",
+      "slug": "skewback",
+      "label": "Skewback",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Skewback shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0.26
+        ],
+        [
+          0.58,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:snipcorner",
+      "slug": "snipcorner",
+      "label": "Snipcorner",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Snipcorner shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0.76
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:staple",
+      "slug": "staple",
+      "label": "Staple",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Staple shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0.14,
+          0.16
+        ],
+        [
+          0.86,
+          0.16
+        ],
+        [
+          0.86,
+          0.88
+        ],
+        [
+          0.68,
+          0.88
+        ],
+        [
+          0.68,
+          0.36
+        ],
+        [
+          0.32,
+          0.36
+        ],
+        [
+          0.32,
+          0.88
+        ],
+        [
+          0.14,
+          0.88
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:stylobate",
+      "slug": "stylobate",
+      "label": "Stylobate",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Stylobate shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          0.34,
+          0
+        ],
+        [
+          0.34,
+          0.34
+        ],
+        [
+          0.67,
+          0.34
+        ],
+        [
+          0.67,
+          0.67
+        ],
+        [
+          1,
+          0.67
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:tetro",
+      "slug": "tetro",
+      "label": "Tetro",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Tetro shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0.5
+        ],
+        [
+          0.66,
+          0.5
+        ],
+        [
+          0.66,
+          1
+        ],
+        [
+          0.33,
+          1
+        ],
+        [
+          0.33,
+          0.5
+        ],
+        [
+          0,
+          0.5
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:ziggurat",
+      "slug": "ziggurat",
+      "label": "Ziggurat",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Ziggurat shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          0.6659999999999999
+        ],
+        [
+          0.33299999999999996,
+          0.6659999999999999
+        ],
+        [
+          0.33299999999999996,
+          0.33299999999999996
+        ],
+        [
+          0.6659999999999999,
+          0.33299999999999996
+        ],
+        [
+          0.6659999999999999,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "tabbied:ziggy",
+      "slug": "ziggy",
+      "label": "Ziggy",
+      "category": "Polygons",
+      "kind": "polygon",
+      "description": "Ziggy shapes repeat in separate tiles with solid gaps.",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          0.5,
+          0.5
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0.5
+        ],
+        [
+          0.5,
+          1
+        ],
+        [
+          0,
+          0.5
+        ]
+      ],
+      "orientation": "random",
+      "turns": [
+        0,
+        0,
+        2,
+        2,
+        1,
+        3
+      ]
+    }
+  ]
+};
+
+
+// ─── src/patterns/tabbied-shapes.js ───
+/** Explicit geometric recipes for reviewed Tabbied masks and rounded shapes.
+ * Curves become polygon edges with at most 0.04 mm chord error. Every recipe
+ * returns filled, separate polygons; ring centers get deliberate solid bridges.
+ * This is not a generic CSS/SVG renderer. Unsupported recipes fail visibly.
+ */
+const TabbiedShapes = (() => {
+  const CURVE_ERROR_MM = 0.04;
+  const TAU = Math.PI * 2;
+  const rectangle = (x, y, width, height) => [[x,y],[x+width,y],[x+width,y+height],[x,y+height]];
+
+  function clean(polygon) {
+    // Exact duplicate endpoints create zero-length edges in the mesher.
+    const points = polygon.map(([x,y]) => [Math.round(x*1e8)/1e8, Math.round(y*1e8)/1e8]);
+    const result = points.filter((p,i) => i === 0 || p[0] !== points[i-1][0] || p[1] !== points[i-1][1]);
+    if (result.length > 1 && result[0][0] === result.at(-1)[0] && result[0][1] === result.at(-1)[1]) result.pop();
+    return result;
+  }
+
+  function arc(cx, cy, radius, from, to, size) {
+    if (radius === 0) return [[cx,cy]];
+    const radiusMM = radius * size;
+    const step = 2 * Math.acos(Math.max(-1, Math.min(1, 1 - CURVE_ERROR_MM / radiusMM)));
+    const count = Math.max(2, Math.ceil(Math.abs(to - from) / step));
+    return Array.from({length: count+1}, (_,i) => {
+      const angle = from + (to-from)*i/count;
+      return [cx+radius*Math.cos(angle), cy+radius*Math.sin(angle)];
+    });
+  }
+
+  function band(cx, cy, outer, inner, from, to, size) {
+    return clean(arc(cx,cy,outer,from,to,size).concat(
+      inner > 0 ? arc(cx,cy,inner,to,from,size) : [[cx,cy]]));
+  }
+
+  function rounded(box, corners, size) {
+    const [x,y,w,h] = box;
+    const radii = corners.map(r => r*Math.min(w,h));
+    const factor = Math.min(1,
+      ...[w/(radii[0]+radii[1]),h/(radii[1]+radii[2]),
+          w/(radii[2]+radii[3]),h/(radii[3]+radii[0])]);
+    const [tl,tr,br,bl] = radii.map(r=>r*factor);
+    return clean([
+      ...arc(x+w-tr,y+tr,tr,-Math.PI/2,0,size),
+      ...arc(x+w-br,y+h-br,br,0,Math.PI/2,size),
+      ...arc(x+bl,y+h-bl,bl,Math.PI/2,Math.PI,size),
+      ...arc(x+tl,y+tl,tl,Math.PI,Math.PI*1.5,size)
+    ]);
+  }
+
+  function choose(values, random, weights) {
+    if (!weights) return values[Math.floor(random()*values.length)];
+    const target = random();
+    let total = 0;
+    for (let i=0; i<values.length; i++) {
+      total += weights[i];
+      if (target < total) return values[i];
+    }
+    return values.at(-1);
+  }
+
+  function ringHalves(outer, inner, gap, size) {
+    // A vertical strip remains solid, with two connections from center to frame.
+    // asin uses the inner radius, the narrowest location of that material strip.
+    const angle = Math.asin(Math.min(0.95, gap/(2*inner)));
+    return [band(0.5,0.5,outer,inner,-Math.PI/2+angle,Math.PI/2-angle,size),
+            band(0.5,0.5,outer,inner,Math.PI/2+angle,Math.PI*1.5-angle,size)];
+  }
+
+  function shapes(design, {size, gap, random, row, rows}) {
+    switch (design.kind) {
+      case 'polygon': return [design.polygon];
+      case 'radius': {
+        const choice = Math.floor(random()*5);
+        if (choice === 4) return [clean(arc(0.5,0.5,0.5,0,TAU,size))];
+        const centers = [[0,0],[1,0],[1,1],[0,1]];
+        const angles = [[0,Math.PI/2],[Math.PI/2,Math.PI],[Math.PI,Math.PI*1.5],[Math.PI*1.5,TAU]];
+        return [band(...centers[choice],1,0,...angles[choice],size)];
+      }
+      case 'rounded': return [rounded(design.box || [0,0,1,1], choose(design.corners,random,design.weights),size)];
+      case 'apse': {
+        const radius = 0.28*0.55; // CSS farthest-side at (55%,50%).
+        return [clean([[0,0],[0.55,0],[0.55,0.5-radius],
+          ...arc(0.55,0.5,radius,-Math.PI/2,Math.PI/2,size),[0.55,1],[0,1]])];
+      }
+      case 'bight': {
+        const radius = 0.28*0.62;
+        return [clean([[0,0],[1,0],[1,0.62],
+          ...arc(0.5,0.62,radius,0,-Math.PI,size),[0,0.62]])];
+      }
+      case 'bluff': {
+        const radius = 0.66;
+        const angle = Math.asin(0.5/radius);
+        return [clean([[0,0],...arc(0,0.5,radius,-angle,angle,size),[0,1]])];
+      }
+      case 'arc': return [band(0,0,design.outer,design.inner,0,Math.PI/2,size)];
+      case 'annulus': {
+        const inner = Math.max(0.46*(0.66-0.46*(row+1)/rows), gap/2+0.015);
+        return ringHalves(0.46,inner,gap,size);
+      }
+      case 'protractor': return [band(0.5,0.5,0.5,0.18,-Math.PI/2,Math.PI/2,size)];
+      case 'paired-arcs': {
+        // At small pitches, keep a solid web between the two inner-facing arcs.
+        const outer = Math.min(design.outer, (Math.SQRT2-gap)/2);
+        if (outer <= design.inner+0.005) return [];
+        return [band(0,0,outer,design.inner,0,Math.PI/2,size),
+                band(1,1,outer,design.inner,Math.PI,Math.PI*1.5,size)];
+      }
+      case 'rectangles': return design.boxes.map(box=>rectangle(...box));
+      case 'weave': {
+        if (random() < 0.12) return [random()<0.5 ? rectangle(0,0,1,1) : clean(arc(0.5,0.5,0.5,0,TAU,size))];
+        return [0,0.25,0.5,0.75].map(y=>rectangle(0,y,1,0.125));
+      }
+      case 'alcove': return [[[0,0],[0.14,0],[0.14,0.86],[0.86,0.86],[0.86,0],[1,0],[1,1],[0,1]]];
+      case 'casing': {
+        // Two C-like halves instead of a closed square cut that frees its center.
+        const half = Math.max(gap/2,0.02);
+        return [ [[0,0],[0.5-half,0],[0.5-half,0.14],[0.14,0.14],[0.14,0.86],
+                  [0.5-half,0.86],[0.5-half,1],[0,1]],
+                 [[0.5+half,0],[1,0],[1,1],[0.5+half,1],[0.5+half,0.86],[0.86,0.86],
+                  [0.86,0.14],[0.5+half,0.14]] ];
+      }
+      case 'maze': {
+        if (random()<0.08) return [clean(arc(0.5,0.5,0.208,0,TAU,size))];
+        // Upstream default gradient half-thickness is 8% of a tile.
+        return [[[0,0.16],[0.84,1],[1,1],[1,0.84],[0.16,0],[0,0]]];
+      }
+      case 'circuit': {
+        const top=random()<0.65, left=random()<0.65;
+        const t=0.07;
+        const result=[];
+        if (top&&left) result.push([[0,0],[1,0],[1,t],[t,t],[t,1],[0,1]]);
+        else if(top) result.push(rectangle(0,0,1,t));
+        else if(left) result.push(rectangle(0,0,t,1));
+        const nodeStart = Math.max(0.18,t+gap);
+        if(random()<0.16) result.push(rectangle(nodeStart+random()*(0.87-nodeStart),nodeStart+random()*(0.87-nodeStart),0.13,0.13));
+        return result;
+      }
+      default: throw new Error(`Unsupported Tabbied recipe: ${design.kind}`);
+    }
+  }
+
+  return { CURVE_ERROR_MM, shapes, arc, band, rounded, clean };
+})();
+
+
+// ─── src/patterns/tabbied.js ───
+/** Tabbied adapter: normalized upstream polygons → spaced millimeter cutouts.
+ * The reviewed definitions are converted at build time. We deliberately use
+ * our own seeded tile layout, not Tabbied's CSS rendering or color randomness.
+ * Only approved filled, simple polygons are accepted by this adapter.
+ */
+const TabbiedPatterns = (() => {
+  const G = PanelGeometry;
+  const MAX_TILES = 144;
+
+  function tilePolygon(polygon, turn, x, y, size, curved) {
+    return polygon.map(([u, v]) => {
+      // Exact quarter turns avoid nearly-horizontal floating point edges.
+      for (let i = 0; i < turn; i++) [u, v] = [1 - v, u];
+      const px = x + u * size, py = y + v * size;
+      // Curve symmetry can produce almost-equal scan rows. A 0.001 mm grid
+      // stays far below our 0.04 mm chord tolerance and above Float32 spacing.
+      return curved ? G.point(Math.round(px*1000)/1000, Math.round(py*1000)/1000) : G.point(px, py);
+    });
+  }
+
+  function generate(settings, cuts) {
+    const design = TabbiedPresets.designs.find(item => item.id === settings.style);
+    const random = PatternTools.seededRandom(settings.seed);
+    const insideX = settings.length - 2 * settings.borderWidth;
+    const insideY = settings.width - 2 * settings.borderWidth;
+    const gap = cuts.minimumWeb + 0.1;
+    let cellSize = Math.min(Math.max(settings.patternSize, design.minCell || 0), insideX, insideY);
+    let columns = Math.floor(insideX / cellSize);
+    let rows = Math.floor(insideY / cellSize);
+    // Bound the amount of geometry for the Canvas preview and STL mesher.
+    while (columns * rows > MAX_TILES) {
+      cellSize *= 1.02;
+      columns = Math.floor(insideX / cellSize);
+      rows = Math.floor(insideY / cellSize);
+    }
+    const size = cellSize - gap;
+    if (size < 2) return { densityLimited: settings.density > 0 };
+    const originX = (settings.length - columns * cellSize) / 2 + gap / 2;
+    const originY = (settings.width - rows * cellSize) / 2 + gap / 2;
+    let rejected = 0;
+    for (let row = 0; row < rows; row++) {
+      for (let column = 0; column < columns; column++) {
+        const index = row * columns + column + 1; // Upstream @i is one-based.
+        const turn = design.orientation === 'cycle' ? index % 4 : design.orientation === 'fixed' ? 0 :
+          design.turns[Math.floor(random() * design.turns.length)];
+        // Density is occupied tiles, unlike the line module's area target.
+        if (random() >= settings.density / 100) continue;
+        const polygons = TabbiedShapes.shapes(design, { size, gap: gap/size, random, row, rows });
+        for (const polygon of polygons) {
+          const hole = tilePolygon(polygon, turn,
+            originX + column * cellSize, originY + row * cellSize, size, design.kind !== 'polygon');
+          if (!cuts.add(hole)) rejected++;
+        }
+      }
+    }
     return {
-      settings: { ...settings }, paths, holes, openArea, minimumWeb,
+      densityLimited: rejected > 0,
+      notice: cellSize > settings.patternSize * 1.001 ?
+        `For this panel, pattern size increased to ${cellSize.toFixed(1)} mm. Use a smaller panel for finer tiles.` : ''
+    };
+  }
+
+  return {
+    id: 'tabbied', label: 'Tabbied', controls: 'tiles',
+    designs: TabbiedPresets.designs,
+    generate
+  };
+})();
+
+
+// ─── src/pattern.js ───
+/** Pattern registry and shared printing rules. Generators only propose holes;
+ * every family passes through the same border, spacing and simplicity checks.
+ * Preview and mesh code consume this result without knowing the generator.
+ */
+const PatternGenerator = (() => {
+  const G = PanelGeometry;
+  const LEGACY_BORDER_MM = 12.7;
+  const LIMITS = {
+    length: [40, 500], width: [40, 500], thickness: [0.6, 20], borderWidth: [1, 200],
+    slitWidth: [0.6, 8], minSlitLength: [0, 1000], patternSize: [10, 150],
+    density: [0, 100], complexity: [1, 8]
+  };
+  const DEFAULTS = {
+    length: 200, width: 160, thickness: 3, borderWidth: 6, slitWidth: 1.6, minSlitLength: 30,
+    patternSize: 30, density: 50, complexity: 5, style: 'circuit', seed: 'neon-01',
+    units: 'mm', color: 'cyan'
+  };
+  const families = [SimplePatterns, TabbiedPatterns];
+  const registry = new Map(families.flatMap(family =>
+    family.designs.map(design => [design.id, { ...design, family }])));
+  const getDesign = style => registry.get(style);
+
+  function validate(settings) {
+    for (const [name, [min, max]] of Object.entries(LIMITS)) {
+      if (typeof settings[name] !== 'number' || !Number.isFinite(settings[name]) ||
+          settings[name] < min || settings[name] > max) {
+        const label = { minSlitLength: 'Minimum slit length', borderWidth: 'Border width',
+          patternSize: 'Pattern size' }[name] || name;
+        throw new Error(`${label} must be between ${min} and ${max}${
+          ['density', 'complexity'].includes(name) ? '' : ' mm'}.`);
+      }
+    }
+    if (settings.borderWidth * 2 >= Math.min(settings.length, settings.width)) {
+      throw new Error('Border width must be less than half the panel’s shorter dimension.');
+    }
+    if (!Number.isInteger(settings.complexity)) throw new Error('Bends must be a whole number.');
+    if (!getDesign(settings.style)) throw new Error('Choose a supported pattern style.');
+    if (typeof settings.seed !== 'string' || !settings.seed.trim() || settings.seed.length > 64) {
+      throw new Error('Enter a seed containing 1–64 characters.');
+    }
+    if (settings.units !== 'mm' && settings.units !== 'in') throw new Error('Choose mm or inches.');
+    return settings;
+  }
+
+  function createCutouts(settings, minimumWeb) {
+    const holes = [];
+    const paths = [];
+    const border = settings.borderWidth;
+    function add(polygon, path = null) {
+      if (path && PatternTools.pathLength(path) < settings.minSlitLength) return false;
+      if (polygon.length < 3 || polygon.some(p => !Number.isFinite(p.x) || !Number.isFinite(p.y))) return false;
+      const hole = polygon.map(p => G.point(p.x, p.y));
+      if (!G.isSimplePolygon(hole)) return false;
+      if (hole.some(p => p.x < border || p.x > settings.length - border ||
+                         p.y < border || p.y > settings.width - border)) return false;
+      if (!holes.every(other => G.polygonsHaveClearance(hole, other, minimumWeb))) return false;
+      if (G.signedArea(hole) > 0) hole.reverse();
+      holes.push(hole);
+      if (path) paths.push(path);
+      return true;
+    }
+    return { holes, paths, minimumWeb, add };
+  }
+
+  function generate(settings) {
+    validate(settings);
+    const family = getDesign(settings.style).family;
+    const minimumWeb = family.controls === 'lines' ? Math.max(2.4, settings.slitWidth) : 2.4;
+    const cuts = createCutouts(settings, minimumWeb);
+    const details = family.generate(settings, cuts);
+    const openArea = cuts.holes.reduce((total, hole) => total + Math.abs(G.signedArea(hole)), 0);
+    return {
+      settings: { ...settings }, holes: cuts.holes, paths: cuts.paths, minimumWeb, openArea,
       openPercent: 100 * openArea / (settings.length * settings.width),
-      densityLimited: openArea < targetArea * 0.85,
+      densityLimited: Boolean(details.densityLimited), notice: details.notice || '',
       volume: (settings.length * settings.width - openArea) * settings.thickness
     };
   }
 
-  return { DEFAULTS, LIMITS, LEGACY_BORDER_MM, validate, seededRandom, pathLength, offsetPath, generate };
+  return {
+    DEFAULTS, LIMITS, LEGACY_BORDER_MM, families, getDesign, validate, generate,
+    createCutouts, ...PatternTools
+  };
 })();
 
 
@@ -983,7 +3891,7 @@ const PanelPreview = (() => {
 (() => {
   const P = PatternGenerator;
   const $ = id => document.getElementById(id);
-  const dimensionNames = ['length', 'width', 'thickness', 'borderWidth', 'slitWidth', 'minSlitLength'];
+  const dimensionNames = ['length', 'width', 'thickness', 'borderWidth', 'slitWidth', 'minSlitLength', 'patternSize'];
   const form = $('settings-form');
   const preview = new PanelPreview.Preview($('preview'));
   let settings = { ...P.DEFAULTS };
@@ -991,6 +3899,42 @@ const PanelPreview = (() => {
   let mesh = null;
   let pendingUpdate = null;
   let canExport = false;
+
+  function populateStyles(filter = '') {
+    const selected = $('style').value || settings.style;
+    const needle = filter.trim().toLowerCase();
+    $('style').replaceChildren();
+    for (const family of P.families) {
+      const groups = new Map();
+      for (const design of family.designs) {
+        const matches = `${design.label} ${design.description || ''} ${design.category || ''} ${family.label}`.toLowerCase().includes(needle);
+        if (!matches && design.id !== selected) continue;
+        const label = !matches ? 'Current selection' : design.category ? `${family.label} · ${design.category}` : family.label;
+        if (!groups.has(label)) {
+          const group = document.createElement('optgroup');
+          group.label = label;
+          groups.set(label, group);
+        }
+        const option = document.createElement('option');
+        option.value = design.id;
+        option.textContent = design.label;
+        groups.get(label).append(option);
+      }
+      $('style').append(...groups.values());
+    }
+    $('style').value = selected;
+  }
+
+  function updatePatternControls() {
+    const design = P.getDesign($('style').value);
+    const tiled = design?.family.controls === 'tiles';
+    $('line-controls').hidden = tiled;
+    $('tile-controls').hidden = !tiled;
+    $('line-controls').querySelectorAll('input').forEach(input => { input.disabled = tiled; });
+    $('patternSize').disabled = !tiled;
+    $('style-hint').textContent = tiled ? `Tabbied · ${design.description}` : '';
+    $('density-hint').textContent = tiled ? 'Percentage of tiles filled with a shape.' : '';
+  }
 
   function displayNumber(value) {
     const converted = settings.units === 'in' ? value / 25.4 : value;
@@ -1020,7 +3964,10 @@ const PanelPreview = (() => {
 
   function writeForm() {
     writeDimensions();
+    $('pattern-filter').value = '';
+    populateStyles();
     for (const name of ['style', 'density', 'complexity', 'seed']) $(name).value = settings[name];
+    updatePatternControls();
     updateRangeLabels();
     updateColor(settings.color);
   }
@@ -1033,6 +3980,7 @@ const PanelPreview = (() => {
   function readForm() {
     const next = { ...settings };
     for (const name of dimensionNames) {
+      if ($(name).disabled) continue;
       const displayed = Number($(name).value);
       // Preserve precise mm values when an input is simply displaying inches.
       next[name] = $(name).value.trim() === '' ? NaN :
@@ -1075,6 +4023,7 @@ const PanelPreview = (() => {
   function regenerate() {
     clearTimeout(pendingUpdate);
     pendingUpdate = null;
+    updatePatternControls();
     const next = readForm();
     markInvalidInputs(next);
     try {
@@ -1090,11 +4039,15 @@ const PanelPreview = (() => {
       updateStats();
       rememberSettings();
       if (pattern.holes.length === 0) {
-        showStatus('No slits fit these settings. Enlarge the panel, reduce the border, slit width or minimum length, or allow more bends.');
+        showStatus(P.getDesign(settings.style).family.controls === 'tiles' ?
+          'No shapes fit these settings. Increase density, enlarge the panel, or reduce the border or pattern size.' :
+          'No slits fit these settings. Enlarge the panel, reduce the border, slit width or minimum length, or allow more bends.');
       } else if (pattern.densityLimited) {
-        showStatus('Spacing and minimum length limit the density for this size. Try narrower slits, a lower minimum length, or a larger panel for more lines.');
+        showStatus(P.getDesign(settings.style).family.controls === 'tiles' ?
+          'Spacing limits the density for this size. Try a larger panel or larger pattern size.' :
+          'Spacing and minimum length limit the density for this size. Try narrower slits, a lower minimum length, or a larger panel for more lines.');
       } else {
-        showStatus('');
+        showStatus(pattern.notice);
       }
       return true;
     } catch (error) {
@@ -1136,7 +4089,8 @@ const PanelPreview = (() => {
 
   function fileName(extension) {
     const seed = settings.seed.replace(/[^a-z0-9_-]/gi, '-').slice(0, 32) || 'pattern';
-    return `light-panel-${seed}.${extension}`;
+    const style = settings.style.replace(/[^a-z0-9_-]/gi, '-');
+    return `light-panel-${style}-${seed}.${extension}`;
   }
 
   function download(blob, name) {
@@ -1207,8 +4161,13 @@ const PanelPreview = (() => {
     } catch { /* Corrupt or unavailable storage: use the defaults. */ }
   }
 
-  form.addEventListener('input', scheduleRegenerate);
-  form.addEventListener('change', regenerate);
+  $('pattern-filter').addEventListener('input', event => populateStyles(event.target.value));
+  form.addEventListener('input', event => {
+    if (event.target.id !== 'pattern-filter') scheduleRegenerate();
+  });
+  form.addEventListener('change', event => {
+    if (event.target.id !== 'pattern-filter') regenerate();
+  });
   form.addEventListener('submit', event => { event.preventDefault(); regenerate(); });
   $('shuffle').addEventListener('click', () => {
     const bytes = new Uint32Array(1);
@@ -1245,6 +4204,7 @@ const PanelPreview = (() => {
   $('load-settings').addEventListener('click', () => $('settings-file').click());
   $('settings-file').addEventListener('change', loadSettings);
 
+  populateStyles();
   restoreLastSession();
   writeForm();
   regenerate();

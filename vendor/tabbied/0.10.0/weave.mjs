@@ -1,0 +1,51 @@
+const weave = {
+    "name": "Weave",
+    "slug": "weave",
+    "galleryOrder": 21,
+    "description": "Stripes alternate between warp and weft from cell to cell, basket-weaving the canvas with the occasional solid patch.",
+    "palette": [
+        "#FFFFFF",
+        "#3E8BFF",
+        "#1B4075",
+        "#3EECFF",
+        "#FF3D8B",
+        "#3FFFB2"
+    ],
+    "colors": {
+        "min": 2,
+        "max": 6,
+        "default": 6
+    },
+    "options": [
+        {
+            "id": "grid",
+            "displayName": "Columns and rows",
+            "type": "ButtonSelectGroup",
+            "default": "8x12",
+            "options": [
+                "2x3",
+                "4x6",
+                "6x9",
+                "8x12",
+                "10x15"
+            ],
+            "replace": "${grid}"
+        },
+        {
+            "id": "frequency",
+            "displayName": "Frequency",
+            "type": "Slider",
+            "default": 1,
+            "min": 0.2,
+            "max": 1,
+            "step": 0.1,
+            "replace": "${shapeFrequency}"
+        }
+    ],
+    "code": {
+        "style": "/* Independent colors for stripes and solid patches */ --randomColor: @p(var(--color1), var(--color2), var(--color3), var(--color4), var(--color5)); --randomColor2: @p(var(--color1), var(--color2), var(--color3), var(--color4), var(--color5)); --rule: ( /*Frequency options of 0.2, 0.4, 0.6, 0.8, 1.0 */ /* Warp vs weft comes from rotating the cell rather than from the gradient angle: transforms transition on reseed, gradients can't */ @random(${shapeFrequency}) { background: repeating-linear-gradient(0deg, var(--randomColor) 0% 12.5%, var(--color0) 12.5% 25%); -webkit-transform: rotate(@pick(0deg, 90deg)); transform: rotate(@pick(0deg, 90deg)); } /* Occasional solid patch interrupts the weave */ @random(0.12) { background: var(--randomColor2); border-radius: @pick(0, 50%); } -webkit-transition: ease 400ms; transition: ease 400ms; );",
+        "doodle": ":doodle { @grid: ${grid}; @size: ${width} ${height}; overflow:hidden; text-align:center; box-sizing:border-box } :container { background: var(--color0); overflow:hidden; }"
+    }
+};
+export default weave;
+//# sourceMappingURL=weave.js.map

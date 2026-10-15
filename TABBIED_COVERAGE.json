@@ -1,0 +1,2681 @@
+{
+  "version": "0.10.0",
+  "total": 382,
+  "supported": 70,
+  "designs": [
+    {
+      "slug": "abutment",
+      "name": "Abutment",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "alcove",
+      "name": "Alcove",
+      "status": "supported",
+      "converter": "alcove",
+      "reason": ""
+    },
+    {
+      "slug": "anabranch",
+      "name": "Anabranch",
+      "status": "supported",
+      "converter": "paired-arcs",
+      "reason": ""
+    },
+    {
+      "slug": "angleoff",
+      "name": "Angleoff",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "annulus",
+      "name": "Annulus",
+      "status": "supported",
+      "converter": "annulus",
+      "reason": ""
+    },
+    {
+      "slug": "apse",
+      "name": "Apse",
+      "status": "supported",
+      "converter": "apse",
+      "reason": ""
+    },
+    {
+      "slug": "aquarelle",
+      "name": "Aquarelle",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "arriccio",
+      "name": "Arriccio",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "arris",
+      "name": "Arris",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "axial",
+      "name": "Axial",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "bangle",
+      "name": "Bangle",
+      "status": "supported",
+      "converter": "arc",
+      "reason": ""
+    },
+    {
+      "slug": "basse",
+      "name": "Basse",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "baste",
+      "name": "Baste",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "batiste",
+      "name": "Batiste",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "battlement",
+      "name": "Battlement",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "bauhaus",
+      "name": "Bauhaus",
+      "status": "supported",
+      "converter": "rounded",
+      "reason": ""
+    },
+    {
+      "slug": "beamspread",
+      "name": "Beamspread",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "bench",
+      "name": "Bench",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "bengaline",
+      "name": "Bengaline",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "bevelset",
+      "name": "Bevelset",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "bias",
+      "name": "Bias",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "bight",
+      "name": "Bight",
+      "status": "supported",
+      "converter": "bight",
+      "reason": ""
+    },
+    {
+      "slug": "bilateral",
+      "name": "Bilateral",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "birdsmouth",
+      "name": "Birdsmouth",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "blindfold",
+      "name": "Blindfold",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "bloks",
+      "name": "Bloks",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "blossom",
+      "name": "Blossom",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "bluff",
+      "name": "Bluff",
+      "status": "supported",
+      "converter": "bluff",
+      "reason": ""
+    },
+    {
+      "slug": "bobbin",
+      "name": "Bobbin",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "bobbinet",
+      "name": "Bobbinet",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "bokeh",
+      "name": "Bokeh",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "bothcut",
+      "name": "Bothcut",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "bothways",
+      "name": "Bothways",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "bowl",
+      "name": "Bowl",
+      "status": "supported",
+      "converter": "rounded",
+      "reason": ""
+    },
+    {
+      "slug": "bowsprit",
+      "name": "Bowsprit",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "bracket",
+      "name": "Bracket",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "buttonhole",
+      "name": "Buttonhole",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "cairo",
+      "name": "Cairo",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "caltrop",
+      "name": "Caltrop",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "capstan",
+      "name": "Capstan",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "cardiograph",
+      "name": "Cardiograph",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "cascade",
+      "name": "Cascade",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "casing",
+      "name": "Casing",
+      "status": "supported",
+      "converter": "casing",
+      "reason": ""
+    },
+    {
+      "slug": "cavetto",
+      "name": "Cavetto",
+      "status": "supported",
+      "converter": "rounded",
+      "reason": ""
+    },
+    {
+      "slug": "cendal",
+      "name": "Cendal",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "centroid",
+      "name": "Centroid",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "chain",
+      "name": "Chain",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "chamfer",
+      "name": "Chamfer",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "charcoal",
+      "name": "Charcoal",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "chase",
+      "name": "Chase",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "chip",
+      "name": "Chip",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "cinch",
+      "name": "Cinch",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "circuit",
+      "name": "Circuit",
+      "status": "supported",
+      "converter": "circuit",
+      "reason": ""
+    },
+    {
+      "slug": "circusposter",
+      "name": "Circus Poster",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "cleat",
+      "name": "Cleat",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "clipcorner",
+      "name": "Clipcorner",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "cobblestone",
+      "name": "Cobblestone",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "coil",
+      "name": "Coil",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "combed",
+      "name": "Combed",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "comet",
+      "name": "Comet",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "concentricrings",
+      "name": "Concentric Rings",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "confettidotfield",
+      "name": "Confetti Dot Field",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "confettitriangles",
+      "name": "Confetti Triangles",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "contourlines",
+      "name": "Contour Lines",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "corduroy",
+      "name": "Corduroy",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "cornerbite",
+      "name": "Cornerbite",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "cornerbloom",
+      "name": "Corner Bloom",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "cornerchip",
+      "name": "Cornerchip",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "cornercut",
+      "name": "Cornercut",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "cornernotch",
+      "name": "Corner Notch",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "cove",
+      "name": "Cove",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "crazypaving",
+      "name": "Crazy Paving",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "crease",
+      "name": "Crease",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "crescendo",
+      "name": "Crescendo",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "crosslattice",
+      "name": "Cross Lattice",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "crossstitch",
+      "name": "Cross Stitch",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "cupola",
+      "name": "Cupola",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "curl",
+      "name": "Curl",
+      "status": "supported",
+      "converter": "paired-arcs",
+      "reason": ""
+    },
+    {
+      "slug": "damier",
+      "name": "Damier",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "dashfield",
+      "name": "Dash Field",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "decay",
+      "name": "Decay",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "diadem",
+      "name": "Diadem",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "diagonalweave",
+      "name": "Diagonal Weave",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "diamondconfetti",
+      "name": "Diamond Confetti",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "diamondember",
+      "name": "Diamond Ember",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "dieblock",
+      "name": "Dieblock",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "dimetric",
+      "name": "Dimetric",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "diminuendo",
+      "name": "Diminuendo",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "dimmer",
+      "name": "Dimmer",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "dipole",
+      "name": "Dipole",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "disque",
+      "name": "Disque",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "dogtooth",
+      "name": "Dogtooth",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "dotdrift",
+      "name": "Dotdrift",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "dotfade",
+      "name": "Dotfade",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "dotfield",
+      "name": "Dotfield",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "dotmatrix",
+      "name": "Dotmatrix",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "dotset",
+      "name": "Dotset",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "dotwash",
+      "name": "Dotwash",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "doublebar",
+      "name": "Doublebar",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "downpour",
+      "name": "Downpour",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "drift",
+      "name": "Drift",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "driftspiral",
+      "name": "Drift Spiral",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "drybrush",
+      "name": "Drybrush",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "drypoint",
+      "name": "Drypoint",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "duotonetruchet",
+      "name": "Duotone Truchet",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "dustfall",
+      "name": "Dustfall",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "eclipserings",
+      "name": "Eclipse Rings",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "elbow",
+      "name": "Elbow",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "ell",
+      "name": "Ell",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "epicentre",
+      "name": "Epicentre",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "evolute",
+      "name": "Evolute",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "eyot",
+      "name": "Eyot",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "facetgrad",
+      "name": "Facetgrad",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "fadedbar",
+      "name": "Fadedbar",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "fadedwedge",
+      "name": "Fadedwedge",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "fadein",
+      "name": "Fadein",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "falloff",
+      "name": "Falloff",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "fanned",
+      "name": "Fanned",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "fenestrate",
+      "name": "Fenestrate",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "flemishbond",
+      "name": "Flemish Bond",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "float",
+      "name": "Float",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "fluting",
+      "name": "Fluting",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "flux",
+      "name": "Flux",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "foldback",
+      "name": "Foldback",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "foliage",
+      "name": "Foliage",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "fractal",
+      "name": "Fractal",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "frieze",
+      "name": "Frieze",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "frond",
+      "name": "Frond",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "fulcrum",
+      "name": "Fulcrum",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "fustian",
+      "name": "Fustian",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "garret",
+      "name": "Garret",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "gasket",
+      "name": "Gasket",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "gesso",
+      "name": "Gesso",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "gimbal",
+      "name": "Gimbal",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "giornata",
+      "name": "Giornata",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "glazing",
+      "name": "Glazing",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "gloaming",
+      "name": "Gloaming",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "globe",
+      "name": "Globe",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "glyph",
+      "name": "Glyph",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "gnomonwedge",
+      "name": "Gnomonwedge",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "goldencoil",
+      "name": "Golden Coil",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "gorge",
+      "name": "Gorge",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "grain",
+      "name": "Grain",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "grainfall",
+      "name": "Grainfall",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "grainfield",
+      "name": "Grainfield",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "gravure",
+      "name": "Gravure",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "gritfield",
+      "name": "Gritfield",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "grosgrain",
+      "name": "Grosgrain",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "guernsey",
+      "name": "Guernsey",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "guilloche",
+      "name": "Guilloche",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "gully",
+      "name": "Gully",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "gutter",
+      "name": "Gutter",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "gyre",
+      "name": "Gyre",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "hairpin",
+      "name": "Hairpin",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "halfmast",
+      "name": "Halfmast",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "halftone",
+      "name": "Halftone",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "halving",
+      "name": "Halving",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "haunch",
+      "name": "Haunch",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "hempleaf",
+      "name": "Hemp Leaf",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "hextruchet",
+      "name": "Hex Truchet",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "hilbert",
+      "name": "Hilbert",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "hitandmiss",
+      "name": "Hit and Miss",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "hongrie",
+      "name": "Hongrie",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "horizonbands",
+      "name": "Horizon Bands",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "hourglass",
+      "name": "Hourglass",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "housing",
+      "name": "Housing",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "hurdle",
+      "name": "Hurdle",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "icecrack",
+      "name": "Ice Crack",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "interlock",
+      "name": "Interlock",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "isocube",
+      "name": "Isocube",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "isometricblocks",
+      "name": "Isometric Blocks",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "isometricweave",
+      "name": "Isometric Weave",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "isometry",
+      "name": "Isometry",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "ivy",
+      "name": "Ivy",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "jerkinhead",
+      "name": "Jerkinhead",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "jetstream",
+      "name": "Jet Stream",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "jibboom",
+      "name": "Jibboom",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "jigsaw",
+      "name": "Jigsaw",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "karst",
+      "name": "Karst",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "kawung",
+      "name": "Kawung",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "kerf",
+      "name": "Kerf",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "kern",
+      "name": "Kern",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "keyway",
+      "name": "Keyway",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "kilngrid",
+      "name": "Kiln Grid",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "knotwork",
+      "name": "Knotwork",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "lagoon",
+      "name": "Lagoon",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "lantern",
+      "name": "Lantern",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "larmier",
+      "name": "Larmier",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "lattice",
+      "name": "Lattice",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "linocut",
+      "name": "Linocut",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "lintel",
+      "name": "Lintel",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "lobe",
+      "name": "Lobe",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "lobeform",
+      "name": "Lobeform",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "loophole",
+      "name": "Loophole",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "louvre",
+      "name": "Louvre",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "lucarne",
+      "name": "Lucarne",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "lunette",
+      "name": "Lunette",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "maelstrom",
+      "name": "Maelstrom",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "maline",
+      "name": "Maline",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "marbledarcs",
+      "name": "Marbled Arcs",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "matryoshka",
+      "name": "Matryoshka",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "maze",
+      "name": "Maze",
+      "status": "supported",
+      "converter": "maze",
+      "reason": ""
+    },
+    {
+      "slug": "meetpart",
+      "name": "Meetpart",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "mercerising",
+      "name": "Mercerising",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "meridianhatch",
+      "name": "Meridian Hatch",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "merlon",
+      "name": "Merlon",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "metro",
+      "name": "Metro",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "midnightblossoms",
+      "name": "Midnight Blossoms",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "midnightconfetti",
+      "name": "Midnight Confetti",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "milkyway",
+      "name": "Milky Way",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "mirrorblack",
+      "name": "Mirrorblack",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "misprint",
+      "name": "Misprint",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "mitre",
+      "name": "Mitre",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "miura",
+      "name": "Miura",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "mixtape",
+      "name": "Mixtape",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "modillion",
+      "name": "Modillion",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "moire",
+      "name": "Moire",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "moleskin",
+      "name": "Moleskin",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "monstera",
+      "name": "Monstera",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "mortise",
+      "name": "Mortise",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "mullion",
+      "name": "Mullion",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "mutule",
+      "name": "Mutule",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "neon",
+      "name": "Neon",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "ninon",
+      "name": "Ninon",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "northernlights",
+      "name": "Northern Lights",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "northstar",
+      "name": "Northstar",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "nosing",
+      "name": "Nosing",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "notch",
+      "name": "Notch",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "notchblock",
+      "name": "Notchblock",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "notchcut",
+      "name": "Notchcut",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "nutation",
+      "name": "Nutation",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "octagon",
+      "name": "Octagon",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "odessa",
+      "name": "Odessa",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "ogee",
+      "name": "Ogee",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "ortho",
+      "name": "Ortho",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "overbar",
+      "name": "Overbar",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "ovolo",
+      "name": "Ovolo",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "paintscribble",
+      "name": "Paint Scribble",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "paperscraps",
+      "name": "Paper Scraps",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "papersea",
+      "name": "Paper Sea",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "parity",
+      "name": "Parity",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "patternsampler",
+      "name": "Pattern Sampler",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "pebble",
+      "name": "Pebble",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "pennantbox",
+      "name": "Pennantbox",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "pentomino",
+      "name": "Pentomino",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "peppering",
+      "name": "Peppering",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "percale",
+      "name": "Percale",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "perforate",
+      "name": "Perforate",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "petalcut",
+      "name": "Petalcut",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "picket",
+      "name": "Picket",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "piechart",
+      "name": "Pie Chart",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "pindot",
+      "name": "Pindot",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "pinwheel",
+      "name": "Pinwheel",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "pivot",
+      "name": "Pivot",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "plait",
+      "name": "Plait",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "polarfan",
+      "name": "Polar Fan",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "polkadot",
+      "name": "Polkadot",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "prisma",
+      "name": "Prisma",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "prismfold",
+      "name": "Prismfold",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "protractor",
+      "name": "Protractor",
+      "status": "supported",
+      "converter": "protractor",
+      "reason": ""
+    },
+    {
+      "slug": "pyramidrelief",
+      "name": "Pyramid Relief",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "quarterburst",
+      "name": "Quarter Burst",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "quartercirclequilt",
+      "name": "Quarter-Circle Quilt",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "quarterfall",
+      "name": "Quarterfall",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "quaver",
+      "name": "Quaver",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "quilt",
+      "name": "Quilt",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "quire",
+      "name": "Quire",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "quoinwedge",
+      "name": "Quoinwedge",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "quoit",
+      "name": "Quoit",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "rabbet",
+      "name": "Rabbet",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "racetrack",
+      "name": "Racetrack",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "radiance",
+      "name": "Radiance",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "radiantswirl",
+      "name": "Radiant Swirl",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "radius",
+      "name": "Radius",
+      "status": "supported",
+      "converter": "radius",
+      "reason": ""
+    },
+    {
+      "slug": "rafter",
+      "name": "Rafter",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "raking",
+      "name": "Raking",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "raku",
+      "name": "Raku",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "randomrings",
+      "name": "Random Rings",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "rebate",
+      "name": "Rebate",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "recession",
+      "name": "Recession",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "reeding",
+      "name": "Reeding",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "reedpen",
+      "name": "Reedpen",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "regimental",
+      "name": "Regimental",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "ribline",
+      "name": "Ribline",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "ridgeline",
+      "name": "Ridgeline",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "rimband",
+      "name": "Rimband",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "ring",
+      "name": "Ring",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "ringfield",
+      "name": "Ringfield",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "ripplering",
+      "name": "Ripplering",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "rolloff",
+      "name": "Rolloff",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "roundcut",
+      "name": "Roundcut",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "roundpair",
+      "name": "Roundpair",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "roundstep",
+      "name": "Roundstep",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "rungs",
+      "name": "Rungs",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "sail",
+      "name": "Sail",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "sandfield",
+      "name": "Sandfield",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "scatteredgems",
+      "name": "Scattered Gems",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "scattershrink",
+      "name": "Scatter Shrink",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "schist",
+      "name": "Schist",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "scotia",
+      "name": "Scotia",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "scramble",
+      "name": "Scramble",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "scumble",
+      "name": "Scumble",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "seamband",
+      "name": "Seamband",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "selbustar",
+      "name": "Selbu Star",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "shading",
+      "name": "Shading",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "shatter",
+      "name": "Shatter",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "sheared",
+      "name": "Sheared",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "shearpair",
+      "name": "Shearpair",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "skewback",
+      "name": "Skewback",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "skewblock",
+      "name": "Skewblock",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "slashbar",
+      "name": "Slashbar",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "slitlattice",
+      "name": "Slit Lattice",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "sliver",
+      "name": "Sliver",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "snipcorner",
+      "name": "Snipcorner",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "snubsquare",
+      "name": "Snub Square",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "softbubbles",
+      "name": "Soft Bubbles",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "softedge",
+      "name": "Softedge",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "sound",
+      "name": "Sound",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "spandrel",
+      "name": "Spandrel",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "spark",
+      "name": "Spark",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "sparkle",
+      "name": "Sparkle",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "speckfield",
+      "name": "Speckfield",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "spectrum",
+      "name": "Spectrum",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "spinningrings",
+      "name": "Spinning Rings",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "spiralblock",
+      "name": "Spiralblock",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "spiralrosette",
+      "name": "Spiral Rosette",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "spit",
+      "name": "Spit",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "spray",
+      "name": "Spray",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "spraydown",
+      "name": "Spraydown",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "squarelabyrinth",
+      "name": "Square Labyrinth",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "squaretunnel",
+      "name": "Square Tunnel",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "staple",
+      "name": "Staple",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "stepramp",
+      "name": "Stepramp",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "stipplefade",
+      "name": "Stipplefade",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "stitch",
+      "name": "Stitch",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "strand",
+      "name": "Strand",
+      "status": "supported",
+      "converter": "rectangles",
+      "reason": ""
+    },
+    {
+      "slug": "streaking",
+      "name": "Streaking",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "stylobate",
+      "name": "Stylobate",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "subdivide",
+      "name": "Subdivide",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "subside",
+      "name": "Subside",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "subwaytile",
+      "name": "Subway Tile",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "sunray",
+      "name": "Sunray",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "sunsetrings",
+      "name": "Sunset Rings",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "swapcut",
+      "name": "Swapcut",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "switchback",
+      "name": "Switchback",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "tailoff",
+      "name": "Tailoff",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "taper",
+      "name": "Taper",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "tealboomerang",
+      "name": "Teal Boomerang",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "teardropleaves",
+      "name": "Teardrop Leaves",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "terrain",
+      "name": "Terrain",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "tesserae",
+      "name": "Tesserae",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "tetro",
+      "name": "Tetro",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "thickset",
+      "name": "Thickset",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "thirdstop",
+      "name": "Thirdstop",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "tidering",
+      "name": "Tidering",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "tidewashbands",
+      "name": "Tidewash Bands",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "tinting",
+      "name": "Tinting",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "toning",
+      "name": "Toning",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "torsion",
+      "name": "Torsion",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "trigram",
+      "name": "Trigram",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "truchetrings",
+      "name": "Truchet Rings",
+      "status": "supported",
+      "converter": "paired-arcs",
+      "reason": ""
+    },
+    {
+      "slug": "tulle",
+      "name": "Tulle",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "turbulentsunburst",
+      "name": "Turbulent Sunburst",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "twohalf",
+      "name": "Twohalf",
+      "status": "supported",
+      "converter": "rectangles",
+      "reason": ""
+    },
+    {
+      "slug": "vanishingpoint",
+      "name": "Vanishing Point",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "veil",
+      "name": "Veil",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "vichy",
+      "name": "Vichy",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "vitrail",
+      "name": "Vitrail",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "wale",
+      "name": "Wale",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "wander",
+      "name": "Wander",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "warpribbon",
+      "name": "Warp Ribbon",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "waterbomb",
+      "name": "Waterbomb",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "wavefans",
+      "name": "Wave Fans",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "wavelet",
+      "name": "Wavelet",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "weave",
+      "name": "Weave",
+      "status": "supported",
+      "converter": "weave",
+      "reason": ""
+    },
+    {
+      "slug": "wedge",
+      "name": "Wedge",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "windowpane",
+      "name": "Windowpane",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "windrow",
+      "name": "Windrow",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "wovenkhaki",
+      "name": "Woven Khaki",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "yabane",
+      "name": "Yabane",
+      "status": "not-yet-converted",
+      "converter": null,
+      "reason": "Needs an explicit recipe and geometry/STL qualification."
+    },
+    {
+      "slug": "ziggurat",
+      "name": "Ziggurat",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    },
+    {
+      "slug": "ziggy",
+      "name": "Ziggy",
+      "status": "supported",
+      "converter": "polygon",
+      "reason": ""
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 # Light Pattern Generator
 
 Generate a rectangular 3D-printable panel with randomized through-slits for
-backlighting. The app is a single, self-contained HTML file with no dependencies,
+backlighting. The app is a single, self-contained HTML file with no runtime dependencies,
 network requests, installation, or server.
 
 ## Use it
@@ -10,8 +10,11 @@ network requests, installation, or server.
    Windows, macOS, and Linux are supported where the browser is available.
 2. Set the panel length, width, thickness, border width, and slit width. Switch
    between mm and inches whenever you like; exported STL coordinates are always **mm**.
-3. Choose Circuit, Lightning, or Mixed. Set the minimum slit length, adjust
-   density and bends, or shuffle until you find a pattern you like.
+3. Choose an original line style (Circuit, Lightning, or Mixed), or a Tabbied
+   shape from 70 reviewed designs. Search by name or browse the category groups.
+   Line styles offer slit width, minimum
+   length, and bends; Tabbied shapes offer pattern size. Adjust density or shuffle
+   until you find a pattern you like.
 4. Check Backlit, Cutouts, or the rotatable 3D model preview.
 5. Download the STL and open it in your slicer. Print with the large flat face
    on the bed; the through-slits do not require supports.
@@ -29,6 +32,16 @@ Settings saved by the earlier app still load: files without this field use 0
 to reproduce their original design. Existing browser sessions without the field
 adopt the new 30 mm default when the updated app opens.
 
+Tabbied shapes use the official preset polygons, adapted into separate tiled
+cutouts. Pattern size defaults to **30 mm** and controls tile size. Density
+controls the percentage of occupied tiles; 100% fills every complete tile and
+0% produces a solid panel. Curved and multi-part styles include
+Radius, Annulus, Curl, Weave, Maze, and Circuit. Rings have solid bridges to
+keep their centers attached, and path-like styles keep gaps between tiles.
+Slit width, minimum line length, and bends apply to
+the original lines and are preserved when you switch back. Tabbied's colors,
+animations, and joining between tiles are not part of these printable adaptations.
+
 Border width defaults to **6 mm** (about 0.24 inches), down from the original
 12.7 mm (½ inch). It sets the minimum solid material between each cutout and
 all four outside edges, including slit corners. Old settings files without a
@@ -44,10 +57,12 @@ does not predict a real light source’s brightness.
 - The panel has a configurable solid border, defaulting to **6 mm**. Borders
   must be 1–200 mm and less than half the panel's shorter dimension. A positive
   frame keeps cutouts away from the exterior; thinner borders may be more flexible.
-- Cutouts have a constant width, flat ends, and sharp, mitered bends.
+- Original line cutouts have a constant width, flat ends, and sharp, mitered bends.
+  Tabbied styles use filled geometric shapes rather than constant-width lines.
+  Curves have a maximum 0.04 mm chord error, with coordinates rounded to 0.001 mm.
 - Shorter paths are discarded before becoming cutouts; the generator never
   relaxes the minimum length to fill an empty area.
-- Paths never close, cross themselves, or touch another cutout. Each cutout
+- Original paths never close, cross themselves, or touch another cutout. Each cutout
   becomes a simple polygon wholly inside the frame, so no disconnected solid
   islands are produced.
 - Automatic material spacing is at least **2.4 mm**, increasing with slit width.
@@ -61,6 +76,10 @@ does not predict a real light source’s brightness.
 - Minimum slit length: 0–1000 mm. A high minimum, a small panel, or very wide
   slits may leave no room for a pattern. The app reports this and allows exporting
   the resulting solid plate. Lower the minimum or allow more bends if needed.
+- Tabbied pattern size: 10–150 mm. Shapes fit within complete square tiles with
+  at least 2.4 mm between neighboring tile bounds. Fine tiling on a very large
+  panel is capped at 144 tiles by increasing the tile size. Multi-part recipes
+  can require larger tiles for spacing; the UI reports any size increase.
 - STL stores no units. Import as millimeters if your slicer asks.
 
 ## Edit the code
@@ -73,11 +92,23 @@ The distributable `index.html` keeps that code readable too; it is not minified.
 | `src/index.template.html` | Accessible controls and page structure |
 | `src/styles.css` | Layout, appearance, responsive sizing |
 | `src/geometry.js` | Shared 2D math and spacing checks |
-| `src/pattern.js` | Seeded random paths and slit outlines |
+| `src/pattern.js` | Registry, settings, shared border/spacing checks, statistics |
+| `src/pattern-tools.js` | Shared seed and path-outline math |
+| `src/patterns/simple.js` | Original Circuit, Lightning, and Mixed generators |
+| `src/patterns/tabbied.js` | Tabbied tile-to-cutout adapter |
+| `src/patterns/tabbied-shapes.js` | Curve, bridged-ring, multi-part and path recipes |
+| `src/patterns/tabbied-presets.js` | Generated geometry from reviewed upstream presets |
+| `vendor/tabbied/0.10.0/` | Pinned official definitions, MIT notice, provenance |
 | `src/mesh.js` | Watertight extrusion and binary STL writer |
 | `src/preview.js` | Canvas backlit, cutout, and 3D views |
 | `src/app.js` | Form events, unit conversion, settings, downloads |
 | `scripts/build.mjs` | Inlines the source into the standalone HTML |
+| `scripts/tabbied-presets.mjs` | Assembles reviewed presets and catalog coverage |
+| `scripts/tabbied-polygons.mjs` | Converts static upstream polygons |
+| `scripts/tabbied-recipes.mjs` | Declarative extended conversion recipes |
+| `scripts/tabbied-reviewed.mjs` | Explicit approved design list |
+| `TABBIED_COVERAGE.json` | Support status for all 382 upstream designs |
+| `scripts/source-modules.mjs` | Source order shared by bundle and tests |
 
 To change the app, edit `src/` and rebuild using **Node.js 20 or newer**:
 
@@ -87,6 +118,9 @@ npm test
 ```
 
 There is nothing to install: both commands use only Node’s built-in modules.
+The selected MIT Tabbied definitions are checked in; their full CSS rendering
+engine is not needed. See [PATTERNS.md](PATTERNS.md) for the module contract,
+conversion details, and the process for adding more verified designs.
 Node is not needed to open or use the generated HTML. The build can run from
 any working directory with `node /path/to/scripts/build.mjs`.
 

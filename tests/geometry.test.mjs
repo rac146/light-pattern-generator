@@ -3,15 +3,61 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
+import { createHash } from 'node:crypto';
+import { engineModules } from '../scripts/source-modules.mjs';
+import { tabbiedPresetSource } from '../scripts/tabbied-presets.mjs';
+import { tabbiedCoverageSource } from '../scripts/tabbied-presets.mjs';
 
 const root = new URL('../', import.meta.url);
-const sources = await Promise.all(['geometry', 'pattern', 'mesh'].map(name =>
+const sources = await Promise.all(engineModules.map(name =>
   readFile(new URL(`src/${name}.js`, root), 'utf8')));
 const context = vm.createContext({ TextEncoder });
 vm.runInContext(sources.join('\n') +
-  '\nglobalThis.engine = { G: PanelGeometry, P: PatternGenerator, M: MeshBuilder };', context);
-const { G, P, M } = context.engine;
+  '\nglobalThis.engine = { G: PanelGeometry, P: PatternGenerator, M: MeshBuilder, shapes: TabbiedShapes };', context);
+const { G, P, M, shapes } = context.engine;
 const settings = changes => ({ ...P.DEFAULTS, ...changes });
+
+test('checked-in Tabbied geometry matches conversion of the pinned upstream definitions', async () => {
+  assert.equal(await readFile(new URL('src/patterns/tabbied-presets.js', root), 'utf8'), tabbiedPresetSource());
+  assert.equal(await readFile(new URL('TABBIED_COVERAGE.json', root), 'utf8'), await tabbiedCoverageSource());
+});
+
+test('all reviewed Tabbied designs regenerate deterministically without relaxing print spacing', () => {
+  assert.equal(P.families[1].designs.length, 70);
+  for (const design of P.families[1].designs) {
+    const config = settings({style: design.id, density: 100, seed: 'catalog-seed'});
+    const first = P.generate(config);
+    assert.ok(first.holes.length > 0, design.id);
+    assert.ok(!first.densityLimited, design.id);
+    assert.deepEqual(first.holes, P.generate(config).holes);
+    assert.deepEqual(first.holes, P.generate({...config,slitWidth:8,minSlitLength:1000,complexity:1}).holes);
+    assert.equal(P.generate({...config,density:0}).holes.length, 0);
+  }
+});
+
+test('curve chords stay within their tolerance and ring centers remain connected to solid bridges', () => {
+  for (const size of [10, 30, 150]) {
+    const radius = 0.5;
+    const points = shapes.arc(0.5,0.5,radius,0,Math.PI*2,size);
+    for (let i=1; i<points.length; i++) {
+      const midX = (points[i-1][0]+points[i][0])/2;
+      const midY = (points[i-1][1]+points[i][1])/2;
+      const chordError = size*(radius-Math.hypot(midX-0.5,midY-0.5));
+      assert.ok(chordError <= shapes.CURVE_ERROR_MM+1e-9);
+    }
+  }
+  for (const style of ['tabbied:annulus','tabbied:casing']) {
+    const pattern = P.generate(settings({style,density:100,patternSize:30}));
+    assert.equal(pattern.holes.length, 48, 'Two open halves per tile');
+    // No cut reaches any of the tile centers; the shared clearance tests above
+    // verify that each pair of halves leaves material between them.
+    for (const x of [25,55,85,115,145,175]) {
+      for (const y of [35,65,95,125]) {
+        assert.ok(pattern.holes.every(hole => !G.pointInPolygon({x,y},hole)));
+      }
+    }
+  }
+});
 
 function inspectMesh(pattern) {
   const mesh = M.build(pattern);
@@ -65,9 +111,14 @@ function inspectMesh(pattern) {
   assert.equal(visited.size, neighbors.size, 'Mesh must be one connected component');
   assert.ok(Math.abs(volume - pattern.volume) / pattern.volume < 1e-5,
     `Volume differs: mesh ${volume}, expected ${pattern.volume}`);
-  assert.equal(Math.min(...vertices.filter((_, i) => i % 3 === 0)), 0);
+  let minX = Infinity, maxX = -Infinity;
+  for (let i=0; i<vertices.length; i+=3) {
+    minX = Math.min(minX, vertices[i]);
+    maxX = Math.max(maxX, vertices[i]);
+  }
+  assert.equal(minX, 0);
   // Binary STL coordinates are float32, so decimal dimensions round slightly.
-  assert.ok(Math.abs(Math.max(...vertices.filter((_, i) => i % 3 === 0)) - pattern.settings.length) < 0.0001);
+  assert.ok(Math.abs(maxX - pattern.settings.length) < 0.0001);
   return mesh;
 }
 
@@ -102,15 +153,87 @@ test('minimum slit length applies to the whole centerline, including bends', () 
 
 test('zero minimum retains legacy seeded designs and short slits', () => {
   // Reference counts for the original app's default seed/settings.
+  // Hashes were captured from the prior standalone HTML, before the refactor.
+  const hashes = {
+    circuit: 'e7d6d64bad6ae983d976cf28c9ce1e223635a9f1b0d89b006faf15d45fe43a42',
+    lightning: '5eb33e0c03e6b5c649e62d5183b17a076bd509d3165e8d973697af127f4de0ea',
+    mixed: 'ab8cd9e338547555e2973ea6202ede53eabf98f0f52c2aa9a1d3fd0915a7e830'
+  };
   for (const [style, count] of [['circuit', 15], ['lightning', 18], ['mixed', 16]]) {
     const legacy = P.generate(settings({ style, minSlitLength: 0, borderWidth: 12.7 }));
     assert.equal(legacy.paths.length, count);
+    assert.equal(createHash('sha256').update(JSON.stringify(legacy.holes)).digest('hex'), hashes[style]);
   }
   const legacy = P.generate(settings({ style: 'lightning', minSlitLength: 0, borderWidth: 12.7 }));
   assert.ok(legacy.paths.some(path => P.pathLength(path) < 30));
   const filtered = P.generate(settings({ style: 'lightning', minSlitLength: 30, borderWidth: 12.7 }));
   assert.ok(filtered.paths.every(path => P.pathLength(path) >= 30));
   assert.notDeepEqual(filtered.holes, legacy.holes);
+});
+
+test('Tabbied styles are seeded, use independent controls, and respect tile density', () => {
+  for (const style of ['tabbied:hilbert', 'tabbied:switchback', 'tabbied:spark']) {
+    const first = P.generate(settings({ style }));
+    assert.ok(first.holes.length > 0);
+    assert.deepEqual(first.holes, P.generate(settings({ style })).holes);
+    assert.notDeepEqual(first.holes, P.generate(settings({ style, seed: 'another seed' })).holes);
+    // Line-only parameters must not silently change a tiled design.
+    assert.deepEqual(first.holes, P.generate(settings({
+      style, slitWidth: 8, minSlitLength: 1000, complexity: 1
+    })).holes);
+    assert.equal(P.generate(settings({ style, density: 0 })).holes.length, 0);
+    const full = P.generate(settings({ style, density: 100 }));
+    assert.equal(full.holes.length, 24); // 6 × 4 complete tiles inside the default border.
+    assert.ok(!full.densityLimited);
+    assert.notDeepEqual(full.holes, P.generate(settings({ style, density: 100, patternSize: 50 })).holes);
+  }
+});
+
+test('Tabbied cutouts keep borders, material spacing, and watertight connected meshes', () => {
+  for (const { id: style } of P.families[1].designs) {
+    for (const changes of [
+      { seed: 'tile-1', density: 100 },
+      { seed: 'tile-2', borderWidth: 1, patternSize: 15, density: 80 },
+      { length: 173.237, width: 109.731, patternSize: 22.375, borderWidth: 4.375, density: 100 },
+      { length: 500, width: 500, patternSize: 10, density: 100, thickness: 20 },
+      { length: 500, width: 40, patternSize: 150, density: 100 },
+      { length: 40, width: 500, patternSize: 10, density: 100 },
+      { length: 40, width: 40, patternSize: 10, density: 100, thickness: 0.6 },
+      { length: 40, width: 40, borderWidth: 19 }
+    ]) {
+      const pattern = P.generate(settings({ style, ...changes }));
+      assert.ok(pattern.holes.length <= 576);
+      for (const [i, hole] of pattern.holes.entries()) {
+        assert.ok(G.isSimplePolygon(hole));
+        assert.ok(G.signedArea(hole) < 0);
+        for (const p of hole) {
+          assert.ok(p.x >= pattern.settings.borderWidth && p.x <= pattern.settings.length - pattern.settings.borderWidth);
+          assert.ok(p.y >= pattern.settings.borderWidth && p.y <= pattern.settings.width - pattern.settings.borderWidth);
+        }
+        for (const other of pattern.holes.slice(i + 1)) {
+          assert.ok(G.polygonsHaveClearance(hole, other, 2.4));
+        }
+      }
+      try { inspectMesh(pattern); }
+      catch(error) { throw new Error(`${style}, ${JSON.stringify(changes)}: ${error.message}`, {cause: error}); }
+    }
+  }
+});
+
+test('shared cutout checks reject crossings, nesting, edge cuts, and undersized paths', () => {
+  const cuts = P.createCutouts(settings(), 2.4);
+  const rectangle = (x, y, size) => [
+    { x, y }, { x: x + size, y }, { x: x + size, y: y + size }, { x, y: y + size }
+  ];
+  assert.equal(cuts.add(rectangle(20, 20, 20)), true);
+  assert.equal(cuts.add(rectangle(25, 25, 5)), false, 'Nested cuts would detach material');
+  assert.equal(cuts.add(rectangle(35, 20, 20)), false, 'Overlapping cuts need a reviewed union converter');
+  assert.equal(cuts.add(rectangle(42, 20, 10)), false, 'Gap is smaller than minimum web');
+  assert.equal(cuts.add(rectangle(44, 20, 10)), true);
+  assert.equal(cuts.add(rectangle(0, 0, 10)), false, 'Border applies to every generator');
+  assert.equal(cuts.add([{ x: 70, y: 20 }, { x: 90, y: 40 }, { x: 90, y: 20 }, { x: 70, y: 40 }]), false);
+  assert.equal(cuts.add(rectangle(100, 20, 10), [{ x: 100, y: 20 }, { x: 105, y: 20 }]), false);
+  assert.equal(cuts.holes.length, 2);
 });
 
 test('high minimum preserves connectivity and never falls back to short slits', () => {
@@ -235,6 +358,7 @@ test('invalid and untrusted settings are rejected', () => {
     { minSlitLength: -1 }, { minSlitLength: 1001 }, { minSlitLength: NaN },
     { minSlitLength: Infinity }, { minSlitLength: '30' },
     { borderWidth: 0 }, { borderWidth: -1 }, { borderWidth: 201 },
-    { borderWidth: NaN }, { borderWidth: Infinity }, { borderWidth: '6' }
+    { borderWidth: NaN }, { borderWidth: Infinity }, { borderWidth: '6' },
+    { patternSize: 0 }, { patternSize: 151 }, { patternSize: NaN }, { style: 'tabbied:unknown' }
   ]) assert.throws(() => P.generate(settings(options)));
 });

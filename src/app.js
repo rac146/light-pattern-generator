@@ -5,7 +5,7 @@
 (() => {
   const P = PatternGenerator;
   const $ = id => document.getElementById(id);
-  const dimensionNames = ['length', 'width', 'thickness', 'borderWidth', 'slitWidth', 'minSlitLength'];
+  const dimensionNames = ['length', 'width', 'thickness', 'borderWidth', 'slitWidth', 'minSlitLength', 'patternSize'];
   const form = $('settings-form');
   const preview = new PanelPreview.Preview($('preview'));
   let settings = { ...P.DEFAULTS };
@@ -13,6 +13,42 @@
   let mesh = null;
   let pendingUpdate = null;
   let canExport = false;
+
+  function populateStyles(filter = '') {
+    const selected = $('style').value || settings.style;
+    const needle = filter.trim().toLowerCase();
+    $('style').replaceChildren();
+    for (const family of P.families) {
+      const groups = new Map();
+      for (const design of family.designs) {
+        const matches = `${design.label} ${design.description || ''} ${design.category || ''} ${family.label}`.toLowerCase().includes(needle);
+        if (!matches && design.id !== selected) continue;
+        const label = !matches ? 'Current selection' : design.category ? `${family.label} · ${design.category}` : family.label;
+        if (!groups.has(label)) {
+          const group = document.createElement('optgroup');
+          group.label = label;
+          groups.set(label, group);
+        }
+        const option = document.createElement('option');
+        option.value = design.id;
+        option.textContent = design.label;
+        groups.get(label).append(option);
+      }
+      $('style').append(...groups.values());
+    }
+    $('style').value = selected;
+  }
+
+  function updatePatternControls() {
+    const design = P.getDesign($('style').value);
+    const tiled = design?.family.controls === 'tiles';
+    $('line-controls').hidden = tiled;
+    $('tile-controls').hidden = !tiled;
+    $('line-controls').querySelectorAll('input').forEach(input => { input.disabled = tiled; });
+    $('patternSize').disabled = !tiled;
+    $('style-hint').textContent = tiled ? `Tabbied · ${design.description}` : '';
+    $('density-hint').textContent = tiled ? 'Percentage of tiles filled with a shape.' : '';
+  }
 
   function displayNumber(value) {
     const converted = settings.units === 'in' ? value / 25.4 : value;
@@ -42,7 +78,10 @@
 
   function writeForm() {
     writeDimensions();
+    $('pattern-filter').value = '';
+    populateStyles();
     for (const name of ['style', 'density', 'complexity', 'seed']) $(name).value = settings[name];
+    updatePatternControls();
     updateRangeLabels();
     updateColor(settings.color);
   }
@@ -55,6 +94,7 @@
   function readForm() {
     const next = { ...settings };
     for (const name of dimensionNames) {
+      if ($(name).disabled) continue;
       const displayed = Number($(name).value);
       // Preserve precise mm values when an input is simply displaying inches.
       next[name] = $(name).value.trim() === '' ? NaN :
@@ -97,6 +137,7 @@
   function regenerate() {
     clearTimeout(pendingUpdate);
     pendingUpdate = null;
+    updatePatternControls();
     const next = readForm();
     markInvalidInputs(next);
     try {
@@ -112,11 +153,15 @@
       updateStats();
       rememberSettings();
       if (pattern.holes.length === 0) {
-        showStatus('No slits fit these settings. Enlarge the panel, reduce the border, slit width or minimum length, or allow more bends.');
+        showStatus(P.getDesign(settings.style).family.controls === 'tiles' ?
+          'No shapes fit these settings. Increase density, enlarge the panel, or reduce the border or pattern size.' :
+          'No slits fit these settings. Enlarge the panel, reduce the border, slit width or minimum length, or allow more bends.');
       } else if (pattern.densityLimited) {
-        showStatus('Spacing and minimum length limit the density for this size. Try narrower slits, a lower minimum length, or a larger panel for more lines.');
+        showStatus(P.getDesign(settings.style).family.controls === 'tiles' ?
+          'Spacing limits the density for this size. Try a larger panel or larger pattern size.' :
+          'Spacing and minimum length limit the density for this size. Try narrower slits, a lower minimum length, or a larger panel for more lines.');
       } else {
-        showStatus('');
+        showStatus(pattern.notice);
       }
       return true;
     } catch (error) {
@@ -158,7 +203,8 @@
 
   function fileName(extension) {
     const seed = settings.seed.replace(/[^a-z0-9_-]/gi, '-').slice(0, 32) || 'pattern';
-    return `light-panel-${seed}.${extension}`;
+    const style = settings.style.replace(/[^a-z0-9_-]/gi, '-');
+    return `light-panel-${style}-${seed}.${extension}`;
   }
 
   function download(blob, name) {
@@ -229,8 +275,13 @@
     } catch { /* Corrupt or unavailable storage: use the defaults. */ }
   }
 
-  form.addEventListener('input', scheduleRegenerate);
-  form.addEventListener('change', regenerate);
+  $('pattern-filter').addEventListener('input', event => populateStyles(event.target.value));
+  form.addEventListener('input', event => {
+    if (event.target.id !== 'pattern-filter') scheduleRegenerate();
+  });
+  form.addEventListener('change', event => {
+    if (event.target.id !== 'pattern-filter') regenerate();
+  });
   form.addEventListener('submit', event => { event.preventDefault(); regenerate(); });
   $('shuffle').addEventListener('click', () => {
     const bytes = new Uint32Array(1);
@@ -267,6 +318,7 @@
   $('load-settings').addEventListener('click', () => $('settings-file').click());
   $('settings-file').addEventListener('change', loadSettings);
 
+  populateStyles();
   restoreLastSession();
   writeForm();
   regenerate();

@@ -9,6 +9,7 @@ import { access, mkdir, readFile, writeFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import vm from 'node:vm';
+import { engineModules } from './source-modules.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const artifacts = path.join(root, 'artifacts');
@@ -116,6 +117,14 @@ try {
   assert.equal(await evaluate('document.querySelector("#export-stl").disabled'), false);
   assert.equal(await evaluate('document.querySelector("#minSlitLength").value'), '30');
   assert.equal(await evaluate('document.querySelector("#borderWidth").value'), '6');
+  assert.ok(await evaluate('document.querySelectorAll("#style optgroup").length >= 4'));
+  assert.equal(await evaluate('document.querySelectorAll("#style option").length'), 73);
+  assert.equal(await evaluate('document.querySelector("#tile-controls").hidden'), true);
+  await evaluate(`document.querySelector('#pattern-filter').value = 'annulus';
+    document.querySelector('#pattern-filter').dispatchEvent(new Event('input', {bubbles:true}))`);
+  assert.equal(await evaluate('document.querySelector("#style").value'), 'circuit');
+  assert.equal(await evaluate('document.querySelectorAll("#style option").length'), 2);
+  await click('#reset');
   await screenshot('desktop-backlit.png');
 
   await click('[data-unit="in"]');
@@ -207,7 +216,7 @@ try {
   assert.ok(triangleCount > 0);
   assert.equal(stl.length, 84 + 50 * triangleCount);
   // The browser and Node/V8 must serialize identical geometry for a saved seed.
-  const engineSources = await Promise.all(['geometry', 'pattern', 'mesh'].map(name =>
+  const engineSources = await Promise.all(engineModules.map(name =>
     readFile(path.join(root, 'src', `${name}.js`), 'utf8')));
   const engineContext = vm.createContext({ TextEncoder });
   const expectedBuffer = vm.runInContext(engineSources.join('\n') +
@@ -261,6 +270,86 @@ try {
   assert.equal(await evaluate('document.querySelector("#borderWidth").value'), '6');
   await click('#reset');
 
+  // Tabbied uses filled tile polygons and its own controls. The saved line
+  // parameters stay intact when switching between generator families.
+  for (const style of ['tabbied:hilbert', 'tabbied:switchback', 'tabbied:spark']) {
+    await evaluate(`document.querySelector('#style').value = ${JSON.stringify(style)};
+      document.querySelector('#style').dispatchEvent(new Event('change', {bubbles:true}))`);
+    assert.equal(await evaluate('document.querySelector("#line-controls").hidden'), true);
+    assert.equal(await evaluate('document.querySelector("#tile-controls").hidden'), false);
+    assert.equal(await evaluate('document.querySelector("#slitWidth").disabled'), true);
+    assert.ok(await evaluate('Number(document.querySelector("#paths-stat").textContent) > 0'));
+    assert.equal(await evaluate('document.querySelector("#export-stl").disabled'), false);
+    await screenshot(`desktop-${style.replace(':', '-')}.png`);
+
+  }
+  for (const style of ['tabbied:radius', 'tabbied:annulus', 'tabbied:curl', 'tabbied:weave', 'tabbied:maze', 'tabbied:circuit']) {
+    await evaluate(`document.querySelector('#style').value = ${JSON.stringify(style)};
+      document.querySelector('#style').dispatchEvent(new Event('change', {bubbles:true}))`);
+    assert.ok(await evaluate('Number(document.querySelector("#paths-stat").textContent) > 0'));
+    assert.equal(await evaluate('document.querySelector("#export-stl").disabled'), false);
+    await screenshot(`desktop-${style.replace(':', '-')}.png`);
+    if (style === 'tabbied:annulus') {
+      await click('#export-stl');
+      const name = await waitFor(async () => (await readdir(downloads))
+        .find(name => name.includes('tabbied-annulus') && name.endsWith('.stl')), 'curved STL download');
+      const actual = await readFile(path.join(downloads, name));
+      const expected = vm.runInContext(
+        'MeshBuilder.binarySTL(MeshBuilder.build(PatternGenerator.generate({...PatternGenerator.DEFAULTS, style:"tabbied:annulus"})))',
+        engineContext);
+      assert.deepEqual(actual, Buffer.from(expected), 'Curved STL bytes must match the geometry engine');
+    }
+  }
+  await evaluate(`document.querySelector('#style').value = 'tabbied:spark';
+    document.querySelector('#style').dispatchEvent(new Event('change', {bubbles:true}))`);
+  await evaluate(`document.querySelector('#density').value = '0';
+    document.querySelector('#density').dispatchEvent(new Event('change', {bubbles:true}))`);
+  assert.equal(await evaluate('document.querySelector("#paths-stat").textContent'), '0');
+  await evaluate(`document.querySelector('#density').value = '100';
+    document.querySelector('#density').dispatchEvent(new Event('change', {bubbles:true}))`);
+  assert.equal(await evaluate('document.querySelector("#paths-stat").textContent'), '24');
+  await evaluate(`document.querySelector('#patternSize').value = '0';
+    document.querySelector('#patternSize').dispatchEvent(new Event('change', {bubbles:true}))`);
+  assert.equal(await evaluate('document.querySelector("#export-stl").disabled'), true);
+  assert.equal(await evaluate('document.querySelector("#patternSize").getAttribute("aria-invalid")'), 'true');
+  await evaluate(`document.querySelector('#patternSize').value = '22.375';
+    document.querySelector('#patternSize').dispatchEvent(new Event('change', {bubbles:true}))`);
+  for (let i = 0; i < 3; i++) { await click('[data-unit="in"]'); await click('[data-unit="mm"]'); }
+  assert.equal(await evaluate('document.querySelector("#patternSize").value'), '22.375');
+  await click('[data-view="3d"]');
+  await screenshot('desktop-tabbied-3d.png');
+  await click('[data-view="light"]');
+
+  const filesBeforeTabbied = new Set(await readdir(downloads));
+  await click('#export-stl');
+  const tabbiedSTLName = await waitFor(async () => (await readdir(downloads))
+    .find(name => name.endsWith('.stl') && !filesBeforeTabbied.has(name)), 'Tabbied STL download');
+  const tabbiedSTL = await readFile(path.join(downloads, tabbiedSTLName));
+  const expectedTabbied = vm.runInContext(
+    'MeshBuilder.binarySTL(MeshBuilder.build(PatternGenerator.generate({...PatternGenerator.DEFAULTS, style:"tabbied:spark", patternSize:22.375, density:100})))',
+    engineContext);
+  assert.deepEqual(tabbiedSTL, Buffer.from(expectedTabbied), 'Tabbied browser STL must match the geometry engine');
+  await click('#save-settings');
+  const tabbiedSettingsName = await waitFor(async () => (await readdir(downloads))
+    .find(name => name.endsWith('.json') && !filesBeforeTabbied.has(name)), 'Tabbied settings download');
+  const tabbiedSaved = JSON.parse(await readFile(path.join(downloads, tabbiedSettingsName), 'utf8'));
+  assert.equal(tabbiedSaved.settings.style, 'tabbied:spark');
+  assert.equal(tabbiedSaved.settings.patternSize, 22.375);
+  await click('#reset');
+  assert.equal(await evaluate('document.querySelector("#line-controls").hidden'), false);
+  assert.equal(await evaluate('document.querySelector("#minSlitLength").value'), '30');
+  const { root: currentDOM } = await command('DOM.getDocument');
+  const { nodeId: currentFileInput } = await command('DOM.querySelector', { nodeId: currentDOM.nodeId, selector: '#settings-file' });
+  await command('DOM.setFileInputFiles', { nodeId: currentFileInput, files: [path.join(downloads, tabbiedSettingsName)] });
+  await waitFor(() => evaluate('document.querySelector("#style").value === "tabbied:spark"'), 'Tabbied settings import');
+  assert.equal(await evaluate('document.querySelector("#patternSize").value'), '22.375');
+  assert.equal(await evaluate('document.querySelector("#line-controls").hidden'), true);
+
+  // Reloading a saved tiled session restores the family as well as dimensions.
+  await command('Page.reload');
+  await waitFor(() => evaluate('document.querySelector("#style")?.value === "tabbied:spark" && document.querySelector("#export-stl")?.disabled === false'), 'Tabbied session restoration');
+  assert.equal(await evaluate('document.querySelector("#patternSize").value'), '22.375');
+
   await command('Emulation.setDeviceMetricsOverride', {
     width: 390, height: 844, deviceScaleFactor: 1, mobile: true
   });
@@ -273,6 +362,10 @@ try {
   await command('Page.navigate', { url: pathToFileURL(standalone).href });
   await waitFor(() => evaluate('document.querySelector("#export-stl")?.disabled === false'), 'copied standalone HTML');
   assert.ok(await evaluate('Number(document.querySelector("#paths-stat").textContent) > 0'));
+  await evaluate(`document.querySelector('#style').value = 'tabbied:hilbert';
+    document.querySelector('#style').dispatchEvent(new Event('change', {bubbles:true}))`);
+  assert.ok(await evaluate('Number(document.querySelector("#paths-stat").textContent) > 0'));
+  assert.equal(await evaluate('document.querySelector("#export-stl").disabled'), false);
   assert.equal(errors.length, 0, `Browser exceptions: ${JSON.stringify(errors)}`);
   assert.ok(requests.every(url => url.startsWith('file:') || url.startsWith('data:')),
     `External app requests: ${JSON.stringify(requests)}`);
