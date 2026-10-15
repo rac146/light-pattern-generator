@@ -58,6 +58,26 @@ the previous HTML guard saved designs against accidental changes.
 Slit width, minimum **whole centerline** length, and bends apply to these styles.
 Density targets an amount of open area and can be limited by spacing.
 
+## Realistic lightning
+
+`src/patterns/realistic-lightning.js` is a separate seeded line generator.
+Unevenly spaced vertices alternate across the main bolt's direction to make
+sharp, irregular zigzags rather than the original eight-direction grid.
+Bends controls the number of vertices and forks. Density targets light-opening
+area, reaching 8% of the usable interior at 100%, subject to spacing and minimum
+length. Bolts vary in length and position to fill the panel; zero density leaves
+a solid plate. Minimum slit length applies to each main centerline, including bends.
+
+Forks use 60% of the main slit width, with a 0.6 mm floor. Each fork replaces
+a short interval on a main outline edge with its own contour, forming a single
+simple branching hole without a polygon union library. There are no closed
+loops or detached small branch slits. Whole candidate outlines pass through
+the same border and spacing checks; forks that do not fit are removed before
+trying the main bolt alone. Coordinates are rounded to 0.001 mm for STL.
+
+This uses a small native algorithm; Tabbied 0.10.0 has no realistic lightning
+preset. The existing line algorithms and Tabbied adapters remain independent.
+
 ## Tabbied adapter
 
 `src/patterns/tabbied.js` currently supports **70 reviewed designs**: 50 static
@@ -127,7 +147,3 @@ transform composition, clipping/union handling, and deliberate material bridges
 for closed line networks. Keep that work within the Tabbied module/converters,
 not in the shared STL exporter. Supporting all 382 designs will require several
 such conversion strategies; it is not a safe one-line catalog import.
-
-Tabbied 0.10.0 has no realistic lightning preset. A future branching lightning
-generator belongs in its own family and should output printable polygons through
-the same checks.

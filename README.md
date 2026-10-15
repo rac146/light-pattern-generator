@@ -10,11 +10,12 @@ network requests, installation, or server.
    Windows, macOS, and Linux are supported where the browser is available.
 2. Set the panel length, width, thickness, border width, and slit width. Switch
    between mm and inches whenever you like; exported STL coordinates are always **mm**.
-3. Choose an original line style (Circuit, Lightning, or Mixed), or a Tabbied
+3. Choose a line style (Circuit, Lightning, Mixed, or **Realistic lightning**), or a Tabbied
    shape from 70 reviewed designs. Search by name or browse the category groups.
    Line styles offer slit width, minimum
    length, and bends; Tabbied shapes offer pattern size. Adjust density or shuffle
-   until you find a pattern you like.
+   until you find a pattern you like. Realistic lightning makes long, rigid
+   zigzag bolts with smaller connected forks; density increases panel coverage.
 4. Check Backlit, Cutouts, or the rotatable 3D model preview.
 5. Download the STL and open it in your slicer. Print with the large flat face
    on the bed; the through-slits do not require supports.
@@ -39,7 +40,7 @@ controls the percentage of occupied tiles; 100% fills every complete tile and
 Radius, Annulus, Curl, Weave, Maze, and Circuit. Rings have solid bridges to
 keep their centers attached, and path-like styles keep gaps between tiles.
 Slit width, minimum line length, and bends apply to
-the original lines and are preserved when you switch back. Tabbied's colors,
+all line styles and are preserved when you switch back. Tabbied's colors,
 animations, and joining between tiles are not part of these printable adaptations.
 
 Border width defaults to **6 mm** (about 0.24 inches), down from the original
@@ -58,6 +59,10 @@ does not predict a real light source’s brightness.
   must be 1–200 mm and less than half the panel's shorter dimension. A positive
   frame keeps cutouts away from the exterior; thinner borders may be more flexible.
 - Original line cutouts have a constant width, flat ends, and sharp, mitered bends.
+  Realistic lightning adds narrower forks to each main bolt as one cutout.
+  Its minimum length applies to the main centerline; forks are part of that slit
+  and can be shorter. Bends adds angular detail; density targets light-opening
+  area across the panel, with spacing and minimum length limiting how much fits.
   Tabbied styles use filled geometric shapes rather than constant-width lines.
   Curves have a maximum 0.04 mm chord error, with coordinates rounded to 0.001 mm.
 - Shorter paths are discarded before becoming cutouts; the generator never
@@ -95,6 +100,7 @@ The distributable `index.html` keeps that code readable too; it is not minified.
 | `src/pattern.js` | Registry, settings, shared border/spacing checks, statistics |
 | `src/pattern-tools.js` | Shared seed and path-outline math |
 | `src/patterns/simple.js` | Original Circuit, Lightning, and Mixed generators |
+| `src/patterns/realistic-lightning.js` | Irregular angular bolts and connected fork outlines |
 | `src/patterns/tabbied.js` | Tabbied tile-to-cutout adapter |
 | `src/patterns/tabbied-shapes.js` | Curve, bridged-ring, multi-part and path recipes |
 | `src/patterns/tabbied-presets.js` | Generated geometry from reviewed upstream presets |

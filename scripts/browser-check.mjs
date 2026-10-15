@@ -118,7 +118,7 @@ try {
   assert.equal(await evaluate('document.querySelector("#minSlitLength").value'), '30');
   assert.equal(await evaluate('document.querySelector("#borderWidth").value'), '6');
   assert.ok(await evaluate('document.querySelectorAll("#style optgroup").length >= 4'));
-  assert.equal(await evaluate('document.querySelectorAll("#style option").length'), 73);
+  assert.equal(await evaluate('document.querySelectorAll("#style option").length'), 74);
   assert.equal(await evaluate('document.querySelector("#tile-controls").hidden'), true);
   await evaluate(`document.querySelector('#pattern-filter').value = 'annulus';
     document.querySelector('#pattern-filter').dispatchEvent(new Event('input', {bubbles:true}))`);
@@ -268,6 +268,30 @@ try {
   await command('Page.reload');
   await waitFor(() => evaluate('document.querySelector("#minSlitLength")?.value === "30" && document.querySelector("#export-stl")?.disabled === false'), 'legacy browser-session migration');
   assert.equal(await evaluate('document.querySelector("#borderWidth").value'), '6');
+  await click('#reset');
+
+  // The new lightning family shares line controls and the offline STL pipeline.
+  await evaluate(`document.querySelector('#style').value = 'realistic-lightning';
+    document.querySelector('#style').dispatchEvent(new Event('change', {bubbles:true}))`);
+  assert.equal(await evaluate('document.querySelector("#line-controls").hidden'), false);
+  assert.equal(await evaluate('document.querySelector("#tile-controls").hidden'), true);
+  assert.equal(await evaluate('document.querySelector("#slitWidth").disabled'), false);
+  assert.ok(await evaluate('Number(document.querySelector("#paths-stat").textContent) > 0'));
+  assert.ok(await evaluate('document.querySelector("#style-hint").textContent.includes("forks")'));
+  await screenshot('desktop-realistic-lightning.png');
+  await click('[data-view="3d"]');
+  await screenshot('desktop-realistic-lightning-3d.png');
+  await click('[data-view="light"]');
+  await click('#export-stl');
+  const lightningName = await waitFor(async () => (await readdir(downloads))
+    .find(name => name.includes('realistic-lightning') && name.endsWith('.stl')), 'realistic lightning STL download');
+  const lightningSTL = await readFile(path.join(downloads, lightningName));
+  const expectedLightning = vm.runInContext(
+    'MeshBuilder.binarySTL(MeshBuilder.build(PatternGenerator.generate({...PatternGenerator.DEFAULTS, style:"realistic-lightning"})))',
+    engineContext);
+  assert.deepEqual(lightningSTL, Buffer.from(expectedLightning), 'Realistic lightning STL bytes must match the geometry engine');
+  await command('Page.reload');
+  await waitFor(() => evaluate('document.querySelector("#style")?.value === "realistic-lightning" && document.querySelector("#export-stl")?.disabled === false'), 'realistic lightning session restoration');
   await click('#reset');
 
   // Tabbied uses filled tile polygons and its own controls. The saved line

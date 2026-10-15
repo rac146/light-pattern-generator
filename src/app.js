@@ -46,8 +46,8 @@
     $('tile-controls').hidden = !tiled;
     $('line-controls').querySelectorAll('input').forEach(input => { input.disabled = tiled; });
     $('patternSize').disabled = !tiled;
-    $('style-hint').textContent = tiled ? `Tabbied · ${design.description}` : '';
-    $('density-hint').textContent = tiled ? 'Percentage of tiles filled with a shape.' : '';
+    $('style-hint').textContent = tiled ? `Tabbied · ${design.description}` : design?.description || '';
+    $('density-hint').textContent = tiled ? 'Percentage of tiles filled with a shape.' : design?.densityHint || '';
   }
 
   function displayNumber(value) {

@@ -16,6 +16,7 @@ vm.runInContext(sources.join('\n') +
   '\nglobalThis.engine = { G: PanelGeometry, P: PatternGenerator, M: MeshBuilder, shapes: TabbiedShapes };', context);
 const { G, P, M, shapes } = context.engine;
 const settings = changes => ({ ...P.DEFAULTS, ...changes });
+const tabbiedDesigns = P.families.find(family => family.id === 'tabbied').designs;
 
 test('checked-in Tabbied geometry matches conversion of the pinned upstream definitions', async () => {
   assert.equal(await readFile(new URL('src/patterns/tabbied-presets.js', root), 'utf8'), tabbiedPresetSource());
@@ -23,8 +24,8 @@ test('checked-in Tabbied geometry matches conversion of the pinned upstream defi
 });
 
 test('all reviewed Tabbied designs regenerate deterministically without relaxing print spacing', () => {
-  assert.equal(P.families[1].designs.length, 70);
-  for (const design of P.families[1].designs) {
+  assert.equal(tabbiedDesigns.length, 70);
+  for (const design of tabbiedDesigns) {
     const config = settings({style: design.id, density: 100, seed: 'catalog-seed'});
     const first = P.generate(config);
     assert.ok(first.holes.length > 0, design.id);
@@ -129,6 +130,54 @@ test('same seed and settings reproduce exactly the same cutouts', () => {
   assert.notDeepEqual(first.holes, P.generate(settings({ seed: 'another seed' })).holes);
 });
 
+test('realistic lightning is seeded, angular and includes joined forks', () => {
+  const config = settings({ style: 'realistic-lightning' });
+  const first = P.generate(config);
+  assert.ok(first.holes.length > 0);
+  assert.deepEqual(first.holes, P.generate(config).holes);
+  assert.notDeepEqual(first.holes, P.generate({ ...config, seed: 'another bolt' }).holes);
+  assert.ok(first.holes.some((hole, i) => hole.length > first.paths[i].length * 2),
+    'A joined fork contributes vertices to the same hole as its main bolt');
+  const angles = first.paths.flatMap(path => path.slice(1).map((p, i) =>
+    Math.atan2(p.y - path[i].y, p.x - path[i].x)));
+  assert.ok(angles.some(angle => Math.abs(angle / (Math.PI / 4) - Math.round(angle / (Math.PI / 4))) > 0.05),
+    'Realistic bolts use irregular angles rather than the original compass grid');
+  assert.ok(P.generate({ ...config, complexity: 8 }).paths[0].length >
+    P.generate({ ...config, complexity: 1 }).paths[0].length);
+  assert.equal(P.generate({ ...config, density: 0 }).holes.length, 0);
+  assert.equal(P.generate({ ...config, minSlitLength: 1000 }).holes.length, 0);
+});
+
+test('realistic lightning respects minimum length, borders and spacing in watertight STL geometry', () => {
+  const configs = [
+    {}, { seed: 'bolt-1' }, { seed: 'bolt-2', density: 100, complexity: 8 },
+    { minSlitLength: 120, seed: 'long-bolt' },
+    { length: 40, width: 40, thickness: 0.6, slitWidth: 0.6, borderWidth: 1, minSlitLength: 0 },
+    { length: 500, width: 40, slitWidth: 8, borderWidth: 1, density: 100 },
+    { length: 40, width: 500, slitWidth: 8, borderWidth: 1, density: 100 },
+    { length: 173.237, width: 129.843, thickness: 2.125, borderWidth: 4.375, slitWidth: 1.125 },
+    { length: 500, width: 500, slitWidth: 0.6, borderWidth: 1, density: 100, complexity: 8 },
+    { borderWidth: 79, minSlitLength: 0 }
+  ];
+  for (const changes of configs) {
+    const config = settings({ style: 'realistic-lightning', ...changes });
+    const pattern = P.generate(config);
+    assert.equal(pattern.paths.length, pattern.holes.length);
+    for (const path of pattern.paths) assert.ok(P.pathLength(path) >= config.minSlitLength);
+    for (const [i, hole] of pattern.holes.entries()) {
+      assert.ok(G.isSimplePolygon(hole));
+      assert.ok(hole.every(p => p.x >= config.borderWidth && p.x <= config.length - config.borderWidth &&
+        p.y >= config.borderWidth && p.y <= config.width - config.borderWidth));
+      for (const other of pattern.holes.slice(i + 1)) {
+        assert.ok(G.polygonsHaveClearance(hole, other, pattern.minimumWeb));
+      }
+    }
+    const mesh = inspectMesh(pattern);
+    const stl = M.binarySTL(mesh);
+    assert.equal(stl.byteLength, 84 + mesh.triangleCount * 50);
+  }
+});
+
 test('minimum slit length applies to the whole centerline, including bends', () => {
   // The endpoints are only 5 mm apart, but the bent path is 65 mm long.
   const bent = [{ x: 0, y: 0 }, { x: 30, y: 0 }, { x: 30, y: 5 }, { x: 0, y: 5 }];
@@ -190,7 +239,7 @@ test('Tabbied styles are seeded, use independent controls, and respect tile dens
 });
 
 test('Tabbied cutouts keep borders, material spacing, and watertight connected meshes', () => {
-  for (const { id: style } of P.families[1].designs) {
+  for (const { id: style } of tabbiedDesigns) {
     for (const changes of [
       { seed: 'tile-1', density: 100 },
       { seed: 'tile-2', borderWidth: 1, patternSize: 15, density: 80 },

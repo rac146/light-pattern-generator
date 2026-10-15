@@ -15,7 +15,7 @@ const PatternGenerator = (() => {
     patternSize: 30, density: 50, complexity: 5, style: 'circuit', seed: 'neon-01',
     units: 'mm', color: 'cyan'
   };
-  const families = [SimplePatterns, TabbiedPatterns];
+  const families = [SimplePatterns, RealisticLightning, TabbiedPatterns];
   const registry = new Map(families.flatMap(family =>
     family.designs.map(design => [design.id, { ...design, family }])));
   const getDesign = style => registry.get(style);
